@@ -1,0 +1,23 @@
+<html><head><title>Directory von C:\Toni\Sonstiges\Startseite\v\voellig_verruecktes_projekt</title>
+<meta name="generator" content="Tonis Directoy-VBScript">
+<meta name="author" content="Antonio Rajic">
+<script type="text/javascript"><!--
+var nam_siz_dat=new Array(
+"directory.htm", "0", "18.03.2011 03:51:12",
+"schach.htm", "23.89", "07.03.2010 23:51:06",
+"schach.rar", "108.94", "05.05.2005 14:56:26"
+);
+var laenge=nam_siz_dat.length / 3;
+document.write("<table cellpadding=1 cellspacing=1 border=1>");
+document.write("<tr><td><b>Nr.<\/b><\/td><td><b>Name<\/b><\/td><td><b>Kb<\/b><\/td><td><b>Datum<\/b><\/td><\/tr>");
+for(var r=0; r<laenge; r++)
+{
+var name=nam_siz_dat[3*r];
+var groesse=nam_siz_dat[3*r+1];
+var date=nam_siz_dat[3*r+2];
+var zaehler=r+1;
+document.write("<tr><td><b>" + zaehler + "<\/b><\/td><td><a href=\"" + name + "\">" + name + "<\/a><\/td><td>" + groesse + "<\/td><td>" + date + "<\/td><\/tr>");
+}
+document.write("<\/table>");
+//--></script></head>
+<body></body></html>

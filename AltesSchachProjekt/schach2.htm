@@ -1,0 +1,530 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Schach</title>
+<script type="text/javascript" src="../../Dat/lib.js"></script>
+<script type="text/javascript"><!--
+var d1=new Date().getTime()/1000;
+// az= am zug (true=weis; false=schwarz)
+var az=true;
+//lm = last move (für en passent)
+//bauer 2 vor= 8,24,4
+var lm=new Array(0,0,7);
+//lm_type: 1=en passant; 2=1./8. Feld erreicht; 3=kl Rochade; 4=gr Rochade; 5=schlägt;
+var lm_type=0;
+// königsposition
+var k_pos_w=4;
+var k_pos_s=60;
+// rochade möglich?
+// 0=weis, 1=schwarz
+var k_moved=new Array(false, false);
+//weis links, rechts; schwarz links, rechts)
+var t_moved=new Array(false, false, false, false);
+
+
+// ganzzahlige division
+function div(a, b)
+{
+         return Math.floor(a/b);
+}
+function setLM(von, nach, wer)
+{
+         lm[0]=von;
+         lm[1]=nach;
+         lm[2]=wer;
+}
+
+// feld anlegen mit figuren   (0 links unten; 63 rechts oben)
+// 0=leer
+// 4=bauer       5
+// 7=turm        8
+// 10=springer   11
+// 13=läufer     14
+// 16=dame       17
+// 19=könig      20
+// schwarz: n%3=2 (schwarzer bauer=2)
+var pf=new Array(64);
+// leeres feld
+for(var i=0;i<64;i++)
+{
+         pf[i]=0;
+}
+// figuren setzen
+// bauern:
+for(var i=8;i<16;i++)
+{
+         pf[i]=4;        //weis
+         pf[i+40]=5;     //schwarz
+}
+//pf[17]=14;
+// türme:
+pf[0]=7;pf[7]=7;pf[56]=8;pf[63]=8;
+// springer:
+pf[1]=10;pf[6]=10;pf[57]=11;pf[62]=11;
+// läufer:
+pf[2]=13;pf[5]=13;pf[58]=14;pf[61]=14;
+// damen/könige - König weis=feld 4; König schwarz=feld 60
+pf[3]=16;pf[4]=19;pf[59]=17;pf[60]=20;
+
+// gibt alle legalen züge zurück ohne den könig zu überprufen
+// erster wert von, zweitzer wert nach (feld nummer)
+function half_legal(feld, am_zug, last_move)
+{
+     var moeglichkeiten=new Array();
+     var zugrichtung=am_zug ? 1 : -1;
+     var whois=am_zug ? 1 : 2;
+
+     // hilfsfunktion die angibt wie weit in die richtung gelaufen werden kann
+     // isOne = nur ein zug/keine rekusrion
+     function senkrecht(pos, x, y, pos_original, isOne)
+     {
+         if(!pos_original)
+         {
+                 var pos_original=pos;
+         }
+         var pos_n=pos+x+y*8;
+         var pos_x=pos%8;
+         var pos_y=div(pos,8);
+
+         var pos_nx=pos_n%8;
+         var pos_ny=div(pos_n,8);
+
+         var d_x=pos_x+x;
+         var d_y=pos_y+y;
+         var tmp=0;
+         //im feld und legaler zug
+         if(-1<pos_n&&pos_n<64&&d_x==pos_nx&&d_y==pos_ny)
+         {
+                 //kein eigener im weg
+                 if(feld[pos_n]%3!=whois)
+                 {
+                         moeglichkeiten.push(pos_original);
+                         moeglichkeiten.push(pos_n);
+                         // rekusriv in die gleiche richtung laufen (nur wenn nicht schon geschlagen)
+                         if(feld[pos_n]%3!=whois+zugrichtung&&!isOne)
+                         {
+                                 senkrecht(pos_n, x, y, pos_original);
+                         }
+                 }
+         }
+
+     }
+
+     for(var i=0;i<64;i++)
+     {
+         var figur=feld[i];
+
+         //schwarz weis filtern
+         if(figur%3==whois){
+
+         // einzelne figuren abarbeiten
+         switch(div(figur,3))
+         {
+                 // bauer 1
+                 case 1:
+                 {
+                         //normalfall: bauer zieht eins nach vorne
+                         var tmp_opt1=i+zugrichtung*8;
+                         if(feld[tmp_opt1]==0)
+                         {
+                                 moeglichkeiten.push(i);
+                                 moeglichkeiten.push(tmp_opt1);
+                                 if(tmp_opt1>55||tmp_opt1<15)
+                                 {
+                                         setLM(i,tmp_opt1, figur);
+                                 }
+                         }
+                         // bauer zieht 2 nach vorne
+                         if(feld[tmp_opt1]==0&&feld[i+zugrichtung*16]==0&&(div(i,8)==3.5-2.5*zugrichtung))
+                         {
+                                 moeglichkeiten.push(i);
+                                 moeglichkeiten.push(i+zugrichtung*16);
+                                 setLM(i, i+zugrichtung*16, figur);
+                         }
+                         // bauer schlägt rechts
+                         if(feld[tmp_opt1+1]%3==whois+zugrichtung)
+                         {
+                                 // falsche züge/auserhalb des brettes filtern
+                                 if(div((tmp_opt1+1),8)-zugrichtung==div(i,8))
+                                 {
+                                     moeglichkeiten.push(i);
+                                     moeglichkeiten.push(tmp_opt1+1);
+                                     setLM(i, tmp_opt1+1, figur);
+                                 }
+                         }
+                         // bauer schlägt links
+                         if(feld[tmp_opt1-1]%3==whois+zugrichtung)
+                         {
+                                 // falsche züge/auserhalb des brettes filtern
+                                 if(div((tmp_opt1-1),8)-zugrichtung==div(i,8))
+                                 {
+                                     moeglichkeiten.push(i);
+                                     moeglichkeiten.push(tmp_opt1-1);
+                                     setLM(i, tmp_opt1-1, figur);
+                                 }
+                         }
+                         // en passent  ( letzter zug: bauer 2 felder vor)
+                         if(Math.abs(div(last_move[0],8)-div(last_move[1],8))==2&&div(last_move[2],3)==1)
+                         {
+                                 // neben mir
+                                 if(last_move[1]==i-1||last_move[1]==i+1)
+                                 {
+                                         // falsche züge/auserhalb des brettes filtern
+                                         if(div(last_move[1],8)==div(i,8))
+                                         {
+                                                 moeglichkeiten.push(i);
+                                                 moeglichkeiten.push(last_move[1]+zugrichtung*8+0.1);
+                                                 setLM(i, last_move[1]+zugrichtung*8, figur);
+                                                 lm_type=1;
+                                         }
+                                 }
+                         }
+
+
+                 }break;
+                 // Turm 2
+                 case 2:
+                 {
+                         senkrecht(i, 0, 1);
+                         senkrecht(i, 0, -1);
+                         senkrecht(i, 1, 0);
+                         senkrecht(i, -1, 0);
+                 }break;
+                 // Springer 3
+                 case 3:
+                 {
+                         senkrecht(i, 1, 2, i, true);
+                         senkrecht(i, -1, 2, i, true);
+                         senkrecht(i, -2, 1, i, true);
+                         senkrecht(i, -2, -1, i, true);
+                         senkrecht(i, -1, -2, i, true);
+                         senkrecht(i, 1, -2, i, true);
+                         senkrecht(i, 2, -1, i, true);
+                         senkrecht(i, 2, 1, i, true);
+                 }break;
+                 // Läufer 4
+                 case 4:
+                 {
+                         senkrecht(i, 1, 1);
+                         senkrecht(i, -1, 1);
+                         senkrecht(i, -1, -1);
+                         senkrecht(i, 1, -1);
+                 }break;
+                 // Dame 5
+                 case 5:
+                 {
+                         senkrecht(i, 0, 1);
+                         senkrecht(i, 0, -1);
+                         senkrecht(i, 1, 0);
+                         senkrecht(i, -1, 0);
+                         senkrecht(i, 1, 1);
+                         senkrecht(i, -1, 1);
+                         senkrecht(i, -1, -1);
+                         senkrecht(i, 1, -1);
+                 }break;
+                 // König 6
+                 case 6:
+                 {
+                         senkrecht(i, 0, 1, i, true);
+                         senkrecht(i, 0, -1, i, true);
+                         senkrecht(i, 1, 0, i, true);
+                         senkrecht(i, -1, 0, i, true);
+                         senkrecht(i, 1, 1, i, true);
+                         senkrecht(i, -1, 1, i, true);
+                         senkrecht(i, -1, -1, i, true);
+                         senkrecht(i, 1, -1, i, true);
+                         // rochade
+                         // wenn könig nicht bewegt wurde
+                         if(!k_moved[zugrichtung*(-1)+1]&&last_move!="WORKAROUND")
+                         {
+                                 var h_legal=half_legal(pf, !az, "WORKAROUND");
+                                 var k_pos=az ? k_pos_w : k_pos_s;
+                                 var tmp_opt=array(h_legal,k_pos);
+                                 // kleine rochade (turm nicht bewegt)
+                                 if(!t_moved[zugrichtung*(-1)+2])
+                                 {
+                                         // nicht im schach und nicht durch schach (2 felder rechts) 2. feld durch legal() gecheckt
+                                         if(tmp_opt==-1&&array(h_legal,k_pos+1))
+                                         {
+                                                 moeglichkeiten.push(i);
+                                                 moeglichkeiten.push(i+2);
+                                                 lm_type=3;
+                                         }
+
+                                 }
+                                 // große rochade (turm nicht bewegt)
+                                 if(!t_moved[zugrichtung*(-1)+1])
+                                 {
+                                      // nicht im schach und nicht durch schach (2 felder links) 2. feld durch legal() gecheckt
+                                         if(tmp_opt==-1&&array(h_legal,k_pos-1))
+                                         {
+                                                 moeglichkeiten.push(i);
+                                                 moeglichkeiten.push(i-2);
+                                                 lm_type=4;
+                                         }
+                                 }
+                         }
+
+                 }
+                 default:break;
+         }
+         } // ende whois
+     }
+
+
+     return moeglichkeiten;
+}
+
+// gibt das feld nach einem zug zurück
+function new_pf(feld_a, von, nach)
+{
+         // array kopieren wegen objekt referenz!
+         var feld=feld_a.slice(0);
+
+         // en passent herausfiltern
+         if(nach!=Math.floor(nach))
+         {
+                 nach=Math.floor(nach);
+                 var tmp_von=von%8;
+                 var tmp_nach=nach%8;
+                 var ziel=von-(tmp_von-tmp_nach);
+                 feld[ziel]=0;
+
+         }
+         else
+         {
+                  var whois=az ? 1 : 2;
+                  var tmp=feld[von];
+                  feld[von]=0;
+                  feld[nach]=tmp;
+
+                  // könig aktualisieren
+                  if(tmp==19)k_pos_w=nach;
+                  if(tmp==20)k_pos_s=nach;
+
+                  //bauer zu dame
+                  if((lm[1]>55||lm[1]<15)&&lm[2]<=5)
+                  {
+                          feld[nach]=15+whois;
+                  }
+                  // rochade
+                  if((tmp==19||tmp==20)&&Math.abs(von%8-nach%8)==2)
+                  {
+                       //kleine rochade
+                       if(nach%8==6)
+                       {
+                         //1*x+c=7
+                         //2*x+c=63
+                         feld[whois*56-49]=0;
+                         feld[whois*56-51]=6+whois;
+                       }
+                       //große rochade
+                       if(nach%8==2)
+                       {
+                         feld[whois*56-56]=0;
+                         feld[whois*56-53]=6+whois;
+                       }
+                  }
+         }
+
+         setLM(von, nach, feld[nach]);
+         return feld;
+}
+
+//gibt alle legalen züge zurück
+function legal()
+{
+         var e=new Array();
+         var h_legal=half_legal(pf, az, lm);
+         var k_pos=az ? k_pos_w : k_pos_s;
+
+         for(var i=0;i<h_legal.length;i=i+2)
+         {
+                 var tmp_feld=new_pf(pf,h_legal[i],h_legal[i+1]);
+                 // to Do: lm
+                 var tmp_gegner_zuege=half_legal(tmp_feld,!az,lm);
+                 // wenn könig vom gegner nicht geschlagen werden kann:
+                 if(array(tmp_gegner_zuege,k_pos)==-1)
+                 {
+                     e.push(h_legal[i]);
+                     e.push(h_legal[i+1]);
+                 }
+         }
+         return e;
+}
+//alert(legal(pf,az,lm).length);
+var d2=new Date().getTime()/1000;
+//alert(d2-d1);
+
+function los(feld)
+{
+         var d=document.fff.debug;
+         document.fff.game.value+="los startet  ";
+     function getImg(pos)
+     {
+         var s="";
+         var figur=feld[pos];
+         var whois=az ? 1 : 2;
+         //figur
+         switch(figur-whois)
+         {
+                 case  3:s="";break;
+                 case  6:s="T";break;
+                 case  9:s="S";break;
+                 case  12:s="L";break;
+                 case  15:s="D";break;
+                 case  18:s="K";break;
+                 default: s="";break;
+         }
+         //figur farbe
+         if(figur!=0){
+         if(az)
+         {
+                 s+="w";
+         }
+         else
+         {
+                s+="s";
+         }}
+         //feld farbe
+         if((pos%8+div(pos,8))%2==0)
+         {
+                 s+="w";
+         }
+         else
+         {
+                 s+="s";
+         }
+         s="bil/" + s + ".jpg";
+         return s;
+     }
+
+     var zuege=legal();
+     var von=zufall(0, zuege.length/2)*2;
+     var nach=von+1;
+     // feld nach dem zug
+     var feld_neu=new_pf(feld, von, nach);
+
+     var abc=new Array("a","b","c","d","e","f","g","h");
+
+     // GUI updaten
+     for(var i=0;i<feld.length;i++)
+     {
+         // fehler liegt hier: felder sind gleich!?
+         if(feld[i]!=feld_neu[i])
+         {
+                 var feld_name_von=abc[von%8] + (div(von,8)+1).toString();
+                 var feld_name_nach=abc[nach%8] + (div(nach,8)+1).toString();
+                 try{
+                 document.getElementsByName(feld_name_von)[0].setAttribute("src",getImg(von));
+                 document.getElementsByName(feld_name_nach)[0].setAttribute("src",getImg(nach));
+                 }
+                 catch(e)
+                 {
+                         d.value+=feld_name_von + " " + feld_name_nach + "\n";
+                 }
+         }
+     }
+     //logik updaten
+     pf=feld_neu.slice(0);
+     az=!az;
+}
+
+
+function spiel()
+{
+         document.fff.game.value+="spiel startet";
+        window.setInterval("los(pf)", 500);
+}
+
+//spiel();
+//--></script></head>
+<body onLoad="javascript:spiel();">
+
+
+<form name="fff">
+<textarea name="game" style="position:absolute; right:0px" cols="30" rows="30"></textarea><br>
+<textarea name="debug" style="position:absolute; right:0px; top:100px" cols="30" rows="30"></textarea>
+</form>
+<table border="0" cellpadding="0" cellspacing="0" width="600" height="600">
+  <!-- 8. reihe -->
+  <tr>
+    <td><img src="bil/Tsw.jpg" name="a8" width="75" height="75"></td>
+    <td><img src="bil/Sss.jpg" name="b8" width="75" height="75"></td>
+    <td><img src="bil/Lsw.jpg" name="c8" width="75" height="75"></td>
+    <td><img src="bil/Dss.jpg" name="d8" width="75" height="75"></td>
+    <td><img src="bil/Ksw.jpg" name="e8" width="75" height="75"></td>
+    <td><img src="bil/Lss.jpg" name="f8" width="75" height="75"></td>
+    <td><img src="bil/Ssw.jpg" name="g8" width="75" height="75"></td>
+    <td><img src="bil/Tss.jpg" name="h8" width="75" height="75"></td>
+  </tr>
+  <tr>
+    <td><img src="bil/ss.jpg" name="a7" width="75" height="75"></td>
+    <td><img src="bil/sw.jpg" name="b7" width="75" height="75"></td>
+    <td><img src="bil/ss.jpg" name="c7" width="75" height="75"></td>
+    <td><img src="bil/sw.jpg" name="d7" width="75" height="75"></td>
+    <td><img src="bil/ss.jpg" name="e7" width="75" height="75"></td>
+    <td><img src="bil/sw.jpg" name="f7" width="75" height="75"></td>
+    <td><img src="bil/ss.jpg" name="g7" width="75" height="75"></td>
+    <td><img src="bil/sw.jpg" name="h7" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/w.jpg" name="a6" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="b6" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="c6" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="d6" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="e6" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="f6" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="g6" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="h6" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/s.jpg" name="a5" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="b5" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="c5" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="d5" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="e5" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="f5" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="g5" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="h5" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/w.jpg" name="a4" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="b4" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="c4" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="d4" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="e4" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="f4" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="g4" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="h4" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/s.jpg" name="a3" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="b3" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="c3" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="d3" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="e3" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="f3" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="g3" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="h3" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/ww.jpg" name="a2" width="75" height="75"></td>
+          <td><img src="bil/ws.jpg" name="b2" width="75" height="75"></td>
+          <td><img src="bil/ww.jpg" name="c2" width="75" height="75"></td>
+          <td><img src="bil/ws.jpg" name="d2" width="75" height="75"></td>
+          <td><img src="bil/ww.jpg" name="e2" width="75" height="75"></td>
+          <td><img src="bil/ws.jpg" name="f2" width="75" height="75"></td>
+          <td><img src="bil/ww.jpg" name="g2" width="75" height="75"></td>
+          <td><img src="bil/ws.jpg" name="h2" width="75" height="75"></td>
+  </tr>
+    <tr>
+    <td><img src="bil/Tws.jpg" name="a1" width="75" height="75"></td>
+    <td><img src="bil/Sww.jpg" name="b1" width="75" height="75"></td>
+    <td><img src="bil/Lws.jpg" name="c1" width="75" height="75"></td>
+    <td><img src="bil/Dww.jpg" name="d1" width="75" height="75"></td>
+    <td><img src="bil/Kws.jpg" name="e1" width="75" height="75"></td>
+    <td><img src="bil/Lww.jpg" name="f1" width="75" height="75"></td>
+    <td><img src="bil/Sws.jpg" name="g1" width="75" height="75"></td>
+    <td><img src="bil/Tww.jpg" name="h1" width="75" height="75"></td>
+  </tr>
+</table>
+</body></html>

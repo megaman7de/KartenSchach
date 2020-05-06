@@ -1,0 +1,841 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Schach</title>
+<script type="text/javascript" src="../../Dat/math.js"></script>
+<script type="text/javascript"><!--
+
+// startposition der figuren und die jeweilige farbe
+var bauern=new Array("a2w","b2w","c2w","d2w","e2w","f2w","g2w","h2w",
+                                                 "a7s","b7s","c7s","d7s","e7s","f7s","g7s","h7s");
+//var bauern=new Array("f3s");
+var pferde=new Array("Sb1w","Sg1w","Sb8s","Sg8s");
+//var pferde=new Array();
+var laeufer=new Array("Lc1w","Lf1w","Lc8s","Lf8s");
+//var laeufer=new Array();
+var tuerme=new Array("Ta1w","Th1w","Ta8s","Th8s");
+//var tuerme=new Array();
+var damen=new Array("Dd1w","Dd8s");
+//var damen=new Array();
+var koenige=new Array("Ke1w","Ke8s");
+var naechster_zug;
+var back_up;
+var ind=1;
+
+
+// das komplette feld 8x8
+var feld=new Array("a1","a2","a3","a4","a5","a6","a7","a8",
+                                          "b1","b2","b3","b4","b5","b6","b7","b8",
+                                          "c1","c2","c3","c4","c5","c6","c7","c8",
+                                          "d1","d2","d3","d4","d5","d6","d7","d8",
+                                          "e1","e2","e3","e4","e5","e6","e7","e8",
+                                          "f1","f2","f3","f4","f5","f6","f7","f8",
+                                          "g1","g2","g3","g4","g5","g6","g7","g8",
+                                          "h1","h2","h3","h4","h5","h6","h7","h8");
+var feld2="," + feld.join(",") + ",";
+
+// letzter zug z.B. für en passant - alle züge
+var zuege=new Array(); //a5-b6
+
+// variabel bei der ich glaube das ich die noch brauchen werde
+var x_pos="abcdefgh";
+
+// ersetzt ein elemet in einem array durch ein anderes
+function rep(array, alt, neu)
+{
+        var kette=new Array();
+        for(var i=0; i<array.length; i++)
+        {
+                if(array[i].indexOf(alt)!=-1)
+                {
+                        if(neu!="")
+                        {
+                                kette.push(neu);
+                        }
+                }
+                else
+                {
+                        kette.push(array[i]);
+                }
+        }
+        return kette;
+}
+
+// prüft ob ein feld frei ist
+// gibt 1 zurück wenn das feld belegt ist und 0 wenn es frei ist
+// erwartet als parameter z.B. a4 od. h2
+function frei(pos, farbe)
+{
+        var alle=new Array();
+        alle.push(bauern);
+        alle.push(pferde);
+        alle.push(laeufer);
+        alle.push(tuerme);
+        alle.push(damen);
+        alle.push(koenige);
+        alle.push(naechster_zug);
+        var kette=alle.join(",");
+        var suche=kette.lastIndexOf(pos);
+        if(!farbe)
+        {
+                if(suche!=-1)
+                {
+                        return 1;
+                }
+                else
+                {
+                        return 0;
+                }
+        }
+        else
+        {
+                if(suche>=0)
+                {
+                        return kette.substring(suche + 2, suche + 3);
+                }
+                else
+                {
+                        return 0;
+                }
+        }
+}
+
+function xr(buchstabe, zahl)
+{
+        var xpos="abcdefgh";
+        var suche=xpos.indexOf(buchstabe);
+        return xpos.substring(suche + zahl, suche + zahl + 1);
+}
+
+// gibt 0 wenn er nicht hin kann zurück und das feld wenn er hin kann, zurück
+function kann_hin(farbe, feld)
+{
+        var far;
+        if(farbe=="w")
+        {
+                far="s";
+        }
+        else
+        {
+                far="w";
+        }
+        naechster_zug="X" + feld + far;
+        // so eine DRECK!!!!
+        var m0=new Array();
+        var m1=m0.concat(zug_bauern(farbe));
+        var m2=m1.concat(zug_pferde(farbe));
+        var m3=m2.concat(zug_laeufer(farbe));
+        var m4=m3.concat(zug_tuerme(farbe));
+        var m5=m4.concat(zug_damen(farbe));
+
+        //var m6=m5.concat(zug_koenige(farbe, 0));
+        // workaround da kann_hin() --> zug_koenig() braucht und umgekehrt
+        var koenige2=koenige.join(",");
+        var pos_x=koenige2.substring(koenige2.indexOf(farbe) - 2, koenige2.indexOf(farbe) - 1);
+        var pos_y=Number(koenige2.substring(koenige2.indexOf(farbe) - 1, koenige2.indexOf(farbe)));
+        var k_feld=koenige2.substring(koenige2.indexOf(farbe) - 3, koenige2.indexOf(farbe) + 1) + "-K";
+        var lo=xr(pos_x, -1) + String(pos_y + 1);
+        var o=pos_x + String(pos_y + 1);
+        var ro=xr(pos_x, 1) + String(pos_y + 1);
+        var r=xr(pos_x, 1) + String(pos_y);
+        var ru=xr(pos_x, 1) + String(pos_y - 1);
+        var u=pos_x + String(pos_y - 1);
+        var lu=xr(pos_x, -1) + String(pos_y - 1);
+        var l=xr(pos_x, -1) + String(pos_y);
+        m5.push(k_feld + lo + farbe);
+        m5.push(k_feld + o + farbe);
+        m5.push(k_feld + ro + farbe);
+        m5.push(k_feld + r + farbe);
+        m5.push(k_feld + ru + farbe);
+        m5.push(k_feld + u + farbe);
+        m5.push(k_feld + lu + farbe);
+        m5.push(k_feld + l + farbe);
+
+        var gefunden=0;
+        for(var i=0; i<m5.length; i++)
+        {
+                if(m5[i].substring(4, 6)==feld||m5[i].substring(6, 8)==feld)
+                {
+                        gefunden=m5[i];
+                        break;
+                }
+        }
+        naechster_zug="";
+        return gefunden;
+}
+
+// berechnet alle möglichen züge für alle bauern
+// w für weiß; s für schwarz
+function zug_bauern(farbe)
+{
+        var moeglichkeiten=new Array();
+        var zugrichtung;
+        for(var i=0; i<bauern.length; i++)
+        {
+                // nur für die jeweilige farbe
+                if(bauern[i].indexOf(farbe)!=-1)
+                {
+                        if(farbe=="w")
+                        {
+                                zugrichtung=1;
+                        }
+                        else
+                        {
+                                zugrichtung=-1;
+                        }
+                        var pos_x=bauern[i].substring(0,1);
+                        var pos_y=bauern[i].substring(1,2);
+
+                        // ein ganz normaler zug nach vorne
+                        if(frei(pos_x + String(Number(pos_y) + zugrichtung))==0)
+                        {
+                                // z.B. a1w-a2w
+                                moeglichkeiten.push(bauern[i] + "-" + pos_x + String(Number(pos_y) + zugrichtung) + farbe);
+                        }
+
+                        // 2 züge am anfang
+                        if((farbe=="w"&&pos_y=="2")||(farbe!="w"&&pos_y=="7"))
+                        {
+                                if(frei(pos_x + String(Number(pos_y) + zugrichtung))==0&&frei(pos_x + String(Number(pos_y) + zugrichtung*2))==0)
+                                {
+                                        moeglichkeiten.push(bauern[i] + "-" + pos_x + String(Number(pos_y) + zugrichtung*2) + farbe);
+                                }
+                        }
+
+                        // diagonal andere figuren schlagen
+                        var neu_pos_y=Number(pos_y) + zugrichtung;
+                        var neu_pos_x1=x_pos.substring(x_pos.indexOf(pos_x) - 1, x_pos.indexOf(pos_x));
+                        var neu_pos_x2=x_pos.substring(x_pos.indexOf(pos_x) + 1, x_pos.indexOf(pos_x) + 2);
+                        // linker zu schlagender bauer
+                        if(pos_x!="a")
+                        {
+                                if(frei(neu_pos_x1 + neu_pos_y, "blabla")!=farbe&&frei(neu_pos_x1 + neu_pos_y, "blabla")!=0)
+                                {
+                                        moeglichkeiten.push(bauern[i] + "-" + neu_pos_x1 + neu_pos_y + farbe);
+                                }
+                        }
+                        // rechter zu schlagender bauer
+                        if(pos_x!="h")
+                        {
+                                if(frei(neu_pos_x2 + neu_pos_y, "blabla")!=farbe&&frei(neu_pos_x2 + neu_pos_y, "blabla")!=0)
+                                {
+                                        moeglichkeiten.push(bauern[i] + "-" + neu_pos_x2 + neu_pos_y + farbe);
+                                }
+                        }
+
+                        // en passant
+                        // wenn c-b od. b-c = 1/-1
+                        // im 1. zug nicht möglich (0 - 1 = -1)
+                        if(zuege.length>0)
+                        {
+                                if(Math.abs(x_pos.indexOf(zuege[zuege.length - 1].substring(4, 5)) - x_pos.indexOf(bauern[i].substring(0,1)))==1)
+                                {
+                                        // wenn y = y (zahl) && y + 2
+                                        if(zuege[zuege.length - 1].substring(5, 6)==bauern[i].substring(1, 2)&&Math.abs(Number(zuege[zuege.length -1].substring(5, 6)) - Number(zuege[zuege.length -1].substring(1, 2)))==2)
+                                        {
+                                                moeglichkeiten.push(bauern[i] + "-" + zuege[zuege.length - 1].substring(4, 5) + String(zugrichtung + Number(pos_y)) + farbe);
+                                        }
+                                }
+                        }
+                }
+        }
+        return moeglichkeiten;
+        //return frei("b3", "blabla");
+}
+
+
+// berechnet alle möglichen züge der läufer
+function zug_laeufer(farbe)
+{
+        var moeglichkeiten=new Array();
+        for(var i=0; i<laeufer.length; i++)
+        {
+                // nur für die jeweilige farbe
+                if(laeufer[i].indexOf(farbe)!=-1)
+                {
+                        var pos_x=laeufer[i].substring(1,2);
+                        var pos_y=laeufer[i].substring(2,3);
+                        function diagonal(x, y)
+                        {
+                                for(var n=1; n<8; n++)
+                                {
+                                        var hilfe1=x_pos.indexOf(pos_x) + n * x;
+                                        var neu_pos_x1=x_pos.substring(hilfe1, hilfe1 + 1);
+                                        var neu_pos_y1=String(Number(pos_y) + n * y);
+                                        var neu_pos=neu_pos_x1 + String(neu_pos_y1);
+                                        // wenn es das feld nicht gibt
+                                        if(feld2.indexOf("," + neu_pos + ",")==-1)
+                                        {
+                                                break;
+                                        }
+                                        // wenn das feld leer oder ein gegner drauf ist
+                                        if(frei(neu_pos, "blabla")==0||(frei(neu_pos, "blabla")!=1&&frei(neu_pos, "blabla")!=farbe))
+                                        {
+                                                moeglichkeiten.push(laeufer[i] + "-L" + neu_pos + farbe);
+                                        }
+                                        // felder die hinter einer figur liegen sollen nicht berechnet werden
+                                        if(frei(neu_pos)==1)
+                                        {
+                                                break;
+                                        }
+                                        //alert(neu_pos);
+                                }
+                        }
+                        diagonal(-1, 1);                // links oben
+                        diagonal(1, 1);                // rechts oben
+                        diagonal(-1, -1);                // links unten
+                        diagonal(1, -1);                // rechts unten
+                }
+        }
+        return moeglichkeiten;
+}
+
+// berechnet alle möglichen züge der türme
+function zug_tuerme(farbe)
+{
+        var moeglichkeiten=new Array();
+        for(var i=0; i<tuerme.length; i++)
+        {
+                // nur für die jeweilige farbe
+                if(tuerme[i].indexOf(farbe)!=-1)
+                {
+                        var pos_x=tuerme[i].substring(1,2);
+                        var pos_y=tuerme[i].substring(2,3);
+                        function senkrecht(x, y)
+                        {
+                                for(var n=1; n<8; n++)
+                                {
+                                        var neu_pos_x=xr(pos_x, n * x);
+                                        var neu_pos_y=Number(pos_y) + n * y;
+                                        var neu_pos=neu_pos_x + String(neu_pos_y);
+                                        // wenn es das feld nicht gibt
+                                        if(feld2.indexOf("," + neu_pos + ",")==-1)
+                                        {
+                                                break;
+                                        }
+                                        // wenn das feld leer oder ein gegner drauf ist
+                                        if(frei(neu_pos, "blabla")==0||(frei(neu_pos, "blabla")!=1&&frei(neu_pos, "blabla")!=farbe))
+                                        {
+                                                moeglichkeiten.push(tuerme[i] + "-T" + neu_pos + farbe);
+                                        }
+                                        // felder die hinter einer figur liegen sollen nicht berechnet werden
+                                        if(frei(neu_pos)==1)
+                                        {
+                                                break;
+                                        }
+                                }
+                        }
+                        senkrecht(0, 1);                        // oben
+                        senkrecht(1, 0);                        // rechts
+                        senkrecht(-1, 0);                        // links
+                        senkrecht(0, -1);                        // unten
+                }
+        }
+        return moeglichkeiten;
+}
+
+// berechnet alle möglichen züge der damen
+function zug_damen(farbe)
+{
+        var moeglichkeiten=new Array();
+        for(var i=0; i<damen.length; i++)
+        {
+                // nur für die jeweilige farbe
+                if(damen[i].indexOf(farbe)!=-1)
+                {
+                        var pos_x=damen[i].substring(1,2);
+                        var pos_y=damen[i].substring(2,3);
+                        function senkrecht(x, y)
+                        {
+                                for(var n=1; n<8; n++)
+                                {
+                                        var neu_pos_x=xr(pos_x, n * x);
+                                        var neu_pos_y=Number(pos_y) + n * y;
+                                        var neu_pos=neu_pos_x + String(neu_pos_y);
+                                        // wenn es das feld nicht gibt
+                                        if(feld2.indexOf("," + neu_pos + ",")==-1)
+                                        {
+                                                break;
+                                        }
+                                        // wenn das feld leer oder ein gegner drauf ist
+                                        if(frei(neu_pos, "blabla")==0||(frei(neu_pos, "blabla")!=1&&frei(neu_pos, "blabla")!=farbe))
+                                        {
+                                                moeglichkeiten.push(damen[i] + "-D" + neu_pos + farbe);
+                                        }
+                                        // felder die hinter einer figur liegen sollen nicht berechnet werden
+                                        if(frei(neu_pos)==1)
+                                        {
+                                                break;
+                                        }
+                                }
+                        }
+                        senkrecht(0, 1);                        // oben
+                        senkrecht(1, 0);                        // rechts
+                        senkrecht(-1, 0);                        // links
+                        senkrecht(0, -1);                        // unten
+                        senkrecht(-1, 1);                        // links oben
+                        senkrecht(1, 1);                        // rechts oben
+                        senkrecht(-1, -1);                // links unten
+                        senkrecht(1, -1);                        // rechts unten
+                }
+        }
+        return moeglichkeiten;
+}
+
+// berechnet alle möglichen züge der pferde
+function zug_pferde(farbe)
+{
+        var moeglichkeiten=new Array();
+        for(var i=0; i<pferde.length; i++)
+        {
+                // nur für die jeweilige farbe
+                if(pferde[i].indexOf(farbe)!=-1)
+                {
+                        var pos_x=pferde[i].substring(1,2);
+                        var pos_y=pferde[i].substring(2,3);
+                        function senkrecht(x, y)
+                        {
+                                for(var n=1; n<2; n++)
+                                {
+                                        var neu_pos_x=xr(pos_x, n * x);
+                                        var neu_pos_y=Number(pos_y) + n * y;
+                                        var neu_pos=neu_pos_x + String(neu_pos_y);
+                                        // wenn es das feld nicht gibt
+                                        if(feld2.indexOf("," + neu_pos + ",")==-1)
+                                        {
+                                                break;
+                                        }
+                                        // wenn das feld leer oder ein gegner drauf ist
+                                        if(frei(neu_pos, "blabla")==0||(frei(neu_pos, "blabla")!=1&&frei(neu_pos, "blabla")!=farbe))
+                                        {
+                                                moeglichkeiten.push(pferde[i] + "-S" + neu_pos + farbe);
+                                        }
+                                        // felder die hinter einer figur liegen sollen nicht berechnet werden
+                                        if(frei(neu_pos)==1)
+                                        {
+                                                break;
+                                        }
+                                }
+                        }
+                        senkrecht(-1, 2);
+                        senkrecht(1, 2);
+                        senkrecht(2, 1);
+                        senkrecht(2, -1);
+                        senkrecht(-1, -2);
+                        senkrecht(1, -2);
+                        senkrecht(-2, 1);
+                        senkrecht(-2, -1);
+                }
+        }
+        return moeglichkeiten;
+}
+
+// berechnet alle möglichen züge der könige
+function zug_koenige(farbe, cal)
+{
+        var moeglichkeiten=new Array();
+        var king;
+        var linker_turm;
+        var rechter_turm;
+        var far;
+        if(farbe=="w")
+        {
+                far="s";
+                king="Ke1w";
+                linker_turm="Ta1w";
+                rechter_turm="Th1w";
+        }
+        else
+        {
+                far="w";
+                king="Ke8s";
+                linker_turm="Ta8s";
+                rechter_turm="Th8s";
+        }
+        for(var i=0; i<koenige.length; i++)
+        {
+                // nur für die jeweilige farbe
+                if(koenige[i].indexOf(farbe)!=-1)
+                {
+                        var pos_x=koenige[i].substring(1,2);
+                        var pos_y=koenige[i].substring(2,3);
+                        function senkrecht(x, y)
+                        {
+                                for(var n=1; n<2; n++)
+                                {
+                                        var neu_pos_x=xr(pos_x, n * x);
+                                        var neu_pos_y=Number(pos_y) + n * y;
+                                        var neu_pos=neu_pos_x + String(neu_pos_y);
+                                        // wenn es das feld nicht gibt
+                                        if(feld2.indexOf("," + neu_pos + ",")==-1)
+                                        {
+                                                break;
+                                        }
+                                        // wenn das feld leer oder ein gegner drauf ist
+                                        if(frei(neu_pos, "blabla")==0||(frei(neu_pos, "blabla")!=1&&frei(neu_pos, "blabla")!=farbe))
+                                        {
+                                                // wenn das feld nicht bedroht wird
+                                                //naechster_zug="K" + neu_pos + farbe;
+                                                if(kann_hin(far, neu_pos)==0)
+                                                {
+                                                        moeglichkeiten.push(koenige[i] + "-K" + neu_pos + farbe);
+                                                }
+                                        }
+                                        // felder die hinter einer figur liegen sollen nicht berechnet werden
+                                        if(frei(neu_pos)==1)
+                                        {
+                                                break;
+                                        }
+                                }
+                        }
+                        senkrecht(0, 1);
+                        senkrecht(1, 1);
+                        senkrecht(1, 0);
+                        senkrecht(1, -1);
+                        senkrecht(0, -1);
+                        senkrecht(-1, -1);
+                        senkrecht(-1, 0);
+                        senkrecht(-1, 1);
+
+                        // rochade
+                        var zuege2=zuege.join(",");
+                        // prüft ob die figur bereits im spiel gezogen wurde gibt 1 zurück wenn sie gezogen worden ist und 0 wenn nicht
+                        function ist_gezogen(figur)
+                        {
+                                var suche=zuege2.indexOf(figur);
+                                if(suche!=-1)
+                                {
+                                        return 1;
+                                }
+                                else
+                                {
+                                        return 0;
+                                }
+                        }
+                        // wenn nicht gezogen und nicht im schach
+                        var k_feld=king.substring(1, 3);
+                        if(ist_gezogen(king)==0&&kann_hin(far, k_feld)==0)
+                        {
+                                // kleine rochade
+                                // wenn der turm existiert und nicht bewegt worden ist
+                                var tuerme2=tuerme.join(",");
+                                if(tuerme2.indexOf(rechter_turm)!=-1&&ist_gezogen(rechter_turm)==0)
+                                {
+                                        // wenn nicht belegt und nicht bedroht (eins rechts vom könig)
+                                        if(frei(xr("e", 1) + String(pos_y))==0&&kann_hin(far, xr("e", 1) + String(pos_y))==0)
+                                        {
+                                                // wenn nicht belegt und nicht bedroht (zwei rechts vom könig)
+                                                if(frei(xr("e", 2) + String(pos_y))==0&&kann_hin(far, xr("e", 2) + String(pos_y))==0)
+                                                {
+                                                        moeglichkeiten.push("0-0");
+                                                }
+                                        }
+                                }
+
+                                // große rochade
+                                // wenn der turm existiert und nicht bewegt worden ist
+                                if(tuerme2.indexOf(linker_turm)!=-1&&ist_gezogen(linker_turm)==0)
+                                {
+                                        // wenn nicht belegt und nicht bedroht (eins links vom könig)
+                                        if(frei(xr("e", -1) + String(pos_y))==0&&kann_hin(far, xr("e", -1) + String(pos_y))==0)
+                                        {
+                                                // wenn nicht belegt und nicht bedroht (zwei links vom könig)
+                                                if(frei(xr("e", -2) + String(pos_y))==0&&kann_hin(far, xr("e", -2) + String(pos_y))==0)
+                                                {
+                                                        moeglichkeiten.push("0-0-0");
+                                                }
+                                        }
+                                }
+                        }
+                }
+        }
+        return moeglichkeiten;
+}
+
+// filtert züge die schachbedingt nicht möglich sind
+// noch zu erledigen:
+// k_feld bestimmen; zug machen; gegner_zug machen; schauen ob gegner auf k_feld kommt (arrays updaten; figuren löchen und backup nicht vergessen)
+function zug_alle(farbe)
+{
+        var ergebnis=new Array();
+        var m0=new Array;
+        var m1=m0.concat(zug_bauern(farbe));
+        var m2=m1.concat(zug_pferde(farbe));
+        var m3=m2.concat(zug_laeufer(farbe));
+        var m4=m3.concat(zug_tuerme(farbe));
+        var m5=m4.concat(zug_damen(farbe));
+        var m6=m5.concat(zug_koenige(farbe));
+        var far;
+        if(farbe=="w")
+        {
+                far="s";
+        }
+        else
+        {
+                far="w";
+        }
+        for(var i=0; i<m6.length; i++)
+        {
+                var k_feld;
+                if(m6[i].indexOf("K")!=-1)
+                {
+                        k_feld=m6[i].substring(6, 8);
+                        // evtl löschen....
+                        // also gut dann halt doch löschen
+                        back_up=m6[i];
+                        koenige=rep(koenige, m6[i].substring(0, 4), m6[i].substring(5, 9));
+
+                }
+                else
+                {
+                        var koenige2=koenige.join(",");
+                        k_feld=koenige2.substring(koenige2.indexOf(farbe) - 2, koenige2.indexOf(farbe));
+                }
+                if(kann_hin(far, k_feld)==0)
+                {
+                        ergebnis.push(m6[i]);
+                }
+                // backup einspielen
+                if(m6[i].indexOf("K")!=-1)
+                {
+                        koenige=rep(koenige, back_up.substring(5, 9), back_up.substring(0, 4));
+                }
+        }
+        return ergebnis;
+}
+
+function ziehen(zug)
+{
+        if(zug!="0-0"&&zug!="0-0-0")
+        {
+                var start_feld=zug.substring(zug.indexOf("-") - 3, zug.indexOf("-") - 1);
+                var end_feld=zug.substring(zug.length - 3, zug.length - 1);
+                var end_figur=zug.substring(zug.indexOf("-") + 1, zug.length);
+
+                function feld_farbe(feld)
+                {
+                        var a;
+                        var b;
+                        if(feld.substring(0, 1)=="a"||feld.substring(0, 1)=="c"||feld.substring(0, 1)=="e"||feld.substring(0, 1)=="g")
+                        {
+                                a=1;
+                        }
+                        if(feld.substring(0, 1)=="b"||feld.substring(0, 1)=="d"||feld.substring(0, 1)=="f"||feld.substring(0, 1)=="h")
+                        {
+                                a=-1;
+                        }
+                        if(Number(feld.substring(1, 2))%2==0)
+                        {
+                                b=1;
+                        }
+                        else
+                        {
+                                b=-1;
+                        }
+                        if(a*b!=1)
+                        {
+                                return "s";
+                        }
+                        else
+                        {
+                                return "w";
+                        }
+                }
+                var farbe=zug.substring(zug.length - 1, zug.length);
+                document.getElementsByName(start_feld)[0].setAttribute("src","bil/" + feld_farbe(start_feld) + ".jpg");
+                document.getElementsByName(end_feld)[0].setAttribute("src","bil/" + zug.substring(zug.indexOf("-") + 1, zug.indexOf(end_feld)) + farbe + feld_farbe(end_feld) + ".jpg");
+                var bauern2=bauern.join(",");
+                var pferde2=pferde.join(",");
+                var laeufer2=laeufer.join(",");
+                var tuerme2=tuerme.join(",");
+                var damen2=damen.join(",");
+                var koenige2=koenige.join(",");
+
+                // geschlagene figur löschen
+                if(bauern2.indexOf(end_feld)!=-1)
+                {
+                        bauern=rep(bauern, end_feld, "");
+                }
+                if(pferde2.indexOf(end_feld)!=-1)
+                {
+                        pferde=rep(pferde, end_feld, "");
+                }
+                if(laeufer2.indexOf(end_feld)!=-1)
+                {
+                        laeufer=rep(laeufer, end_feld, "");
+                }
+                if(tuerme2.indexOf(end_feld)!=-1)
+                {
+                        tuerme=rep(tuerme, end_feld, "");
+                }
+                if(damen2.indexOf(end_feld)!=-1)
+                {
+                        damen=rep(damen, end_feld, "");
+                }
+                if(koenige2.indexOf(end_feld)!=-1)
+                {
+                        koenige=rep(koenige, end_feld, "");
+                }
+                // array updaten
+                if(bauern2.indexOf(start_feld)!=-1)
+                {
+                        bauern=rep(bauern, start_feld, end_figur);
+                }
+                if(pferde2.indexOf(start_feld)!=-1)
+                {
+                        pferde=rep(pferde, start_feld, end_figur);
+                }
+                if(laeufer2.indexOf(start_feld)!=-1)
+                {
+                        laeufer=rep(laeufer, start_feld, end_figur);
+                }
+                if(tuerme2.indexOf(start_feld)!=-1)
+                {
+                        tuerme=rep(tuerme, start_feld, end_figur);
+                }
+                if(damen2.indexOf(start_feld)!=-1)
+                {
+                        damen=rep(damen, start_feld, end_figur);
+                }
+                if(koenige2.indexOf(start_feld)!=-1)
+                {
+                        koenige=rep(koenige, start_feld, end_figur);
+                }
+
+                // wenn ein bauer das 8. bzw das 1. Feld erreicht
+                if(zug.length==7&&(zug.indexOf("1")!=-1||zug.indexOf("8")!=-1))
+                {
+                        alert("bauer-->dame");
+                        // bauern löschen
+                        bauern=rep(bauern, end_feld, "");
+                        // dame hinzufügen
+                        var neu_dame="D" + end_feld + zug.substring(2, 3);
+                        damen.push(neu_dame);
+                        // dame "anzeigen"
+                        document.getElementsByName(end_feld)[0].setAttribute("src","bil/D" + zug.substring(2, 3) + feld_farbe(end_feld) + ".jpg");
+                }
+        document.fff.spiel.value+=zug + ", ";
+        }
+        else
+        {
+         alert("Rochade");
+        }
+}
+
+function los()
+{
+        var fb;
+        if(ind==1)
+        {
+                fb="w";
+        }
+        else
+        {
+                fb="s";
+        }
+        var zug_tmp=zug_alle(fb);
+
+        ziehen(zug_tmp[zufall(0, zug_tmp.length - 1)]);
+        // weiß, schwarz, weiß usw.
+        ind=ind * -1;
+}
+
+function spiel()
+{
+        window.setInterval("los()", 1000);
+}
+
+spiel();
+//--></script></head>
+<body><!-- onLoad="javascript:ziehen('a2w-a3w')"> -->
+
+
+<form name="fff">
+<textarea name="spiel" style="position:absolute; right:0px" cols="30" rows="30"></textarea>
+</form>
+<table border="0" cellpadding="0" cellspacing="0" width="600" height="600">
+  <!-- 8. reihe -->
+  <tr>
+    <td><img src="bil/Tsw.jpg" name="a8" width="75" height="75"></td>
+    <td><img src="bil/Sss.jpg" name="b8" width="75" height="75"></td>
+    <td><img src="bil/Lsw.jpg" name="c8" width="75" height="75"></td>
+    <td><img src="bil/Dss.jpg" name="d8" width="75" height="75"></td>
+    <td><img src="bil/Ksw.jpg" name="e8" width="75" height="75"></td>
+    <td><img src="bil/Lss.jpg" name="f8" width="75" height="75"></td>
+    <td><img src="bil/Ssw.jpg" name="g8" width="75" height="75"></td>
+    <td><img src="bil/Tss.jpg" name="h8" width="75" height="75"></td>
+  </tr>
+  <tr>
+    <td><img src="bil/ss.jpg" name="a7" width="75" height="75"></td>
+    <td><img src="bil/sw.jpg" name="b7" width="75" height="75"></td>
+    <td><img src="bil/ss.jpg" name="c7" width="75" height="75"></td>
+    <td><img src="bil/sw.jpg" name="d7" width="75" height="75"></td>
+    <td><img src="bil/ss.jpg" name="e7" width="75" height="75"></td>
+    <td><img src="bil/sw.jpg" name="f7" width="75" height="75"></td>
+    <td><img src="bil/ss.jpg" name="g7" width="75" height="75"></td>
+    <td><img src="bil/sw.jpg" name="h7" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/w.jpg" name="a6" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="b6" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="c6" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="d6" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="e6" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="f6" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="g6" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="h6" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/s.jpg" name="a5" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="b5" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="c5" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="d5" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="e5" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="f5" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="g5" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="h5" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/w.jpg" name="a4" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="b4" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="c4" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="d4" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="e4" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="f4" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="g4" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="h4" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/s.jpg" name="a3" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="b3" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="c3" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="d3" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="e3" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="f3" width="75" height="75"></td>
+          <td><img src="bil/s.jpg" name="g3" width="75" height="75"></td>
+          <td><img src="bil/w.jpg" name="h3" width="75" height="75"></td>
+  </tr>
+  <tr>
+          <td><img src="bil/ww.jpg" name="a2" width="75" height="75"></td>
+          <td><img src="bil/ws.jpg" name="b2" width="75" height="75"></td>
+          <td><img src="bil/ww.jpg" name="c2" width="75" height="75"></td>
+          <td><img src="bil/ws.jpg" name="d2" width="75" height="75"></td>
+          <td><img src="bil/ww.jpg" name="e2" width="75" height="75"></td>
+          <td><img src="bil/ws.jpg" name="f2" width="75" height="75"></td>
+          <td><img src="bil/ww.jpg" name="g2" width="75" height="75"></td>
+          <td><img src="bil/ws.jpg" name="h2" width="75" height="75"></td>
+  </tr>
+    <tr>
+    <td><img src="bil/Tws.jpg" name="a1" width="75" height="75"></td>
+    <td><img src="bil/Sww.jpg" name="b1" width="75" height="75"></td>
+    <td><img src="bil/Lws.jpg" name="c1" width="75" height="75"></td>
+    <td><img src="bil/Dww.jpg" name="d1" width="75" height="75"></td>
+    <td><img src="bil/Kws.jpg" name="e1" width="75" height="75"></td>
+    <td><img src="bil/Lww.jpg" name="f1" width="75" height="75"></td>
+    <td><img src="bil/Sws.jpg" name="g1" width="75" height="75"></td>
+    <td><img src="bil/Tww.jpg" name="h1" width="75" height="75"></td>
+  </tr>
+
+</table>
+
+
+
+</body></html>
