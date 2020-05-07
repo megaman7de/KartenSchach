@@ -7,7 +7,7 @@ function createBoard(table, hidden)
 	{
         //richtige größe finden
         var min=Math.min(window.innerWidth,window.innerHeight);
-        var size=Math.floor(min*0.8/10)*10;
+        var size=Math.floor(min*0.9/10)*10;
         
         table.setAttribute("id","table1");
         table.setAttribute("width",size);
