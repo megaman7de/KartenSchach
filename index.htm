@@ -2,14 +2,19 @@
 <html><head><title>KartenSchach</title>
 <link rel="stylesheet" href="css/style.css">
 <script type="text/javascript" src="js/board.js"></script>
+<script type="text/javascript" src="js/boardLogic.js"></script>
 <script type="text/javascript"><!--
 
 function start()
 {
 	var table=createTable(10);
 	var board=createBoard(table, 1);
+	
+	
 	var cb=document.getElementById("chessboard");
-	cb.appendChild(table);
+	cb.appendChild(board);
+	
+	setBoard();
 }
 
 //--></script></head>

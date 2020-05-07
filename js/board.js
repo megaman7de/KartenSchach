@@ -36,8 +36,6 @@ function createBoard(table, hidden)
         		charCode Tabelle:
         		"95": "_", "96": "`",     "97": "a",     "98": "b"
         		*/
-        		//var x=String.fromCharCode(start_x+table_size-i);
-        		//var y=(j+start_y);
         		var x=String.fromCharCode(start_x+j);
         		var y=start_y+(table_size-i);
         		td.setAttribute("id",x+""+y);
