@@ -3,13 +3,14 @@
 <link rel="stylesheet" href="css/style.css">
 <script type="text/javascript" src="js/board.js"></script>
 <script type="text/javascript" src="js/boardLogic.js"></script>
+<script type="text/javascript" src="js/functions.js"></script>
 <script type="text/javascript"><!--
 
 function start()
 {
 	var board=createBoard(1);
 	
-	var cb=document.getElementById("chessboard");
+	var cb=g("chessboard");
 	cb.appendChild(board);
 	
 	setBoard();

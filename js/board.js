@@ -82,7 +82,6 @@ function createTable(n)
 		}
 		table.appendChild(tr);
 	}
-	
 	return table;
 }
 
