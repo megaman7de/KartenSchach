@@ -9,7 +9,7 @@ function setFigure(field, figure, color)
 	feld.style.backgroundSize="cover";
 }
 
-// baut die Ausgangsstellung des spiels auf
+// baut die Ausgangsstellung des Spiels auf
 function setBoard()
 {
 	var aufstellung=["R","N","B","Q","K","B","N","R"];
