@@ -12,6 +12,9 @@ function setFigure(field, figure, color)
 // baut die Ausgangsstellung des Spiels auf
 function setBoard()
 {
+	// zuerst alles löschen
+	clearBoard("table1");
+
 	var aufstellung=["R","N","B","Q","K","B","N","R"];
 	for(var i=1;i<=8;i++)
 	{
@@ -22,4 +25,20 @@ function setBoard()
 		setFigure(xr(i)+1, aufstellung[i-1], "w");
 		setFigure(xr(i)+8, aufstellung[i-1], "b");
 	}
+}
+
+// löscht alle Figuren vom Brett
+function clearBoard(field)
+{
+	var feld=g(field);
+	var trs=feld.getElementsByTagName("tr");
+	for(var i=0;i<trs.length;i++)
+    {
+        var tds=trs[i].getElementsByTagName("td");
+        // spalten durch gehen
+    	for(var j=0;j<tds.length;j++)
+    	{
+    		tds[j].style.backgroundImage="";
+    	}
+    }
 }
