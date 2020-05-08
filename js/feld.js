@@ -62,3 +62,15 @@ function feld(_id, _figur)
 	if(_id)this.setId(_id);
 	if(_figur)this.setFigur(_figur);
 }
+
+// definiert das figur-Objekt
+function figur(name)
+{
+	var id = "";
+	var img = "";
+	var name = "";
+	var color = "";
+	var moves = [];
+	var cards = [];
+
+}
