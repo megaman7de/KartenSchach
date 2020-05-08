@@ -3,10 +3,10 @@
 // toDo: besser wäre erst ein Object der Figur zu haben
 function setFigure(field, figure, color)
 {
-	var feld=g(field);
+	var feld_=g(field);
 	var fico=figure.toUpperCase().substring(0, 1) + color.toLowerCase().substring(0, 1);
-	feld.style.backgroundImage="url(\"img/svg/" + fico  + ".svg\")";
-	feld.style.backgroundSize="cover";
+	feld_.style.backgroundImage="url(\"img/svg/" + fico  + ".svg\")";
+	feld_.style.backgroundSize="cover";
 }
 
 // baut die Ausgangsstellung des Spiels auf
@@ -30,8 +30,8 @@ function setBoard()
 // löscht alle Figuren vom Brett
 function clearBoard(field)
 {
-	var feld=g(field);
-	var trs=feld.getElementsByTagName("tr");
+	var feld_=g(field);
+	var trs=feld_.getElementsByTagName("tr");
 	for(var i=0;i<trs.length;i++)
     {
         var tds=trs[i].getElementsByTagName("td");
