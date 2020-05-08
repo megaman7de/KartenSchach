@@ -1,0 +1,27 @@
+cardId,title_de,title_en,type,text
+1,Ritterwelt,Kinghtsworld,Weltkarte,"Es existeriert eine Rahmenfeld um das gesamte Spiel, dieses darf nur von Springern genutzt werden. Diese Karte setzt die Zylinderwelt für Springer außer Kraft."
+2,Bipolarität,Sexchange,Zugkarte,"Du darfst einen eigenen Läufer um ein Feld nach rechts versetzen, wenn es frei ist. "
+3,Bauernvormarsch,On The Rise,Zugkarte,Die Bauern schlagen im nächsten Zug gerade und fahren diagonal
+4,Trojanisches Pferd,Trojan Horse,Zugkarte,Ein eigener Turm wird zu einem Pferd.
+5,Neubevölkerung,tenacious infantry,Zugkarte,"Du darfst einen Bauern an einer freien Stelle, in deiner Bauernstartreihe wiederbeleben."
+6,Versteckte Liebschaft,Polygamy of the king,Zugkarte,"Opfere beide Türm, du erhälst eine Dame an der Position deiner Türm, der Gegner entscheidet an welcher."
+7,Geheimgänge,secret passage,Zugkarte,Dein König hat im nächsten Zug Radius 2 und darf hüpfen.
+8,Heiliger Krieg,holy war,Zugkarte,Die Läufer fahren einen Zug wie Türme.
+9,Bürgeropfer,Sacrifice for the greater good,Zugkarte,"Opfere eine deiner Kreatur, zerstöre eine schwächer Kreatur deines Gegners (Reihenfolge: Dame, Turm , Läufer und Pferd gleichstark, Bauer)"
+10,Erzwungener Frieden,enforced peace treaty,Zugkarte,"Im den nächsten 2 Zügen können keine Figuren geschlagen werden. (Jedoch dürfen, wenn andere Karten dies erlauben zerstört oder geopfert werden.)"
+11,Fallenfeld,Trap,Weltkarte,"Bestimme ein Feld, jede Figur die auf dieses Feld zieht wird zerstört. (Die Figur wird nicht zerstört, wenn die Figur dort schon steht oder auf dem Feld eingesetzt wird.)"
+12,Blockade,blockade,Weltkarte,"Setze eine Blockade auf ein freies Feld, diese wird behandelt wie eine Figur, die nicht geschlagen werden kann (blockiert das Portal sowie das Fallenfeld)."
+13,Zusammenarbeit,Teamwork,Zugkarte,Tausche eine Figuren mit einer Wertigkeit von 3 mit einem Turm. Dein Gegner hat die Wahl ob er auch tauscht oder einen Zug macht.
+14,Doppelgänger,Double,Zugkarte,Vertausche deinen König mit einem Bauern.
+15,Zweite Chance,Second Chance,Zugkarte,"Der letzte Zug wird rückgängig gemacht und man darf seinen Halbzug ändern. Dies darf nur ausgespielt werden, wenn im letzten Zug keine Karten gespielt wurden."
+16,Rückzug,retreat,Zugkarte,"Die Bauern fahren im nächsten Zug rückwärts, das heißt genau so als hätten sie von der anderen Seite gestartet."
+17,Zylinderwelt,Cylindric-world,Weltkarte,"Alle Figuren dürfen die Rechte und Linke Grenze des Standartypielfeldes überschreiten als ob sie mit einander verbunden wären und auf der gegenüberligenden Seite ihre Bewegung fortfahren. Diese Karte darf nicht gespielt werden, wenn der gegnerische König dadurch bedroht wird."
+18,Koalition,coalition,Zugkarte,"Im nächsten Zug darf man eine Figur auf ein Feld ziehen auf dem schon eine eigene Figur steht. Dies muss nicht aufgelöst werden, jedoch können beide wie eine Figur geschlagen werden."
+19,Aufrüstung,Armament,Zugkarte,"Eine Figur darf im nächsten Zug schießen, dies bedeutet sie kann eine Figur die sonst auch geschlagen werden kann entfernen ohne sich von dem Platz zu bewegen."
+20,Portal,portal,Weltkarte,Bestimme zwei Felder auf dennen keine gegnerischen Figuren sitzen. Eine Figur die auf einem der Felder landet wird auf das andere Feld teleportiert.
+21,Treibsand,Quicksand,Weltkarte,"Bestimme ein Feld, jede Figur die versucht darüber hinweg zufahren, landet auf diesem Feld. (Springer hüpfen darüber)"
+22,Befestigunswall,Rampart,Weltkarte,"Setze eine Mauer, welche drei Felder lang ist, zwischen 6 Felder ein. Keine Figur kann darüber hinwegziehen. (Springer hüpfen darüber)"
+23,Selbstmordattentat,suicide assassination,Zugkarte,"Bestimme eine eigene Figur mit Wertigkeit 3. Nach deinem Zug stirbt diese Figur und falls Figuren ein Feld rechts und links davon stehen, diese auch."
+24,Verlockung,Temptation,Zugkarte,"Wenn im nächsten Zug geschlagen werden kann, muss man dies tun, außer man opfert stattdesen eine Figur und zieht nicht."
+25,Fusionswelt,Fusionswelt,Weltkarte,"Anstatt eines Zuges dürfen Figuren gegen eine bessere Figur für den gleichen Wert getauscht werden. An einer Stelle wo die alte Figuren standen wird die Figur eingesetzt, der Gegner bestimmt an welcher. "
+26,Erdbeben,Earth Quake,Zugkarte,Im nächsten Zug darf man anstatt einen Zug zu machen alle Figuren in einer Reihe um ein Feld nach rechts oder alle um ein Feld nach links versetzen. 
