@@ -74,3 +74,5 @@ function figur(name)
 	var cards = [];
 
 }
+
+// visual studio test
