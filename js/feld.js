@@ -29,7 +29,6 @@ function feld(_id, _figur)
 	this.setFigur=function(fi)
     {
         // die figur muss das feld (feldId) erben, weil child nicht auf parent zugreifen kann
-        // todo Setter feldId schreiben
         fi.setFeldId(this.id);
         figur.push(fi);
 
@@ -42,8 +41,11 @@ function feld(_id, _figur)
 	// getters
 	this.cards=cards;
 	this.img=img;
-	this.figur=figur;
-	this.empty=empty;
+	//this.figur=figur;
+    this.empty = empty;
+    this.getFigur = function () {
+        return this.figur;
+    }
 	
 	// functions
 	// evtl enthält cards nicht nur die ids sondern die Karten als Objekte
@@ -137,7 +139,12 @@ function someMoveFunction(figur) {
 
 // tests
 var fig = new figur("Rw");
-fig.setFeldId("a1");
+//fig.setFeldId("a1");
+
+var fel = new feld("a1", fig);
+//fel.setFigur(fig);
 fig.setMoves();
 var m = fig.moves;
 console.log(m);
+var m2 = fel.getFigur();
+console.log(m2);
