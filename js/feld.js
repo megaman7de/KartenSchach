@@ -138,6 +138,12 @@ function someMoveFunction(figur) {
     return ["e2-e3", "e2-e4"];
 }
 
+var cardRequest = loadJSON("https://raw.githubusercontent.com/megaman7de/KartenSchach/master/files/cards.json");
+var alleKarten;
+cardRequest.onload = function () {
+    alleKarten = cardRequest.responseText;
+    // ab hier kann man auf die karten zugreifen
+}
 /*tests
 var fig = new figur("Rw");
 fig.setName("Kw");

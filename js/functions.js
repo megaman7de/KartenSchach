@@ -53,6 +53,35 @@ function removeE(arr, e) {
     }
 }
 
+// erstellt einen http-request und gibt diesen zurück
+function loadJSON(url) {
+    var xmlHttp = null;
+    var res = undefined;
+    try {
+        xmlHttp = new XMLHttpRequest();
+    } catch (e) {
+        alert("Error: http-request not supportet")
+    }
+    if (xmlHttp) {
+        xmlHttp.open('GET', url, true);
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == 4) {
+               // res = xmlHttp.responseText;
+            }
+        };
+        xmlHttp.send(null);
+    }
+    return xmlHttp;
+}
+
+//x ms warten
+function wait(ms) {
+    var d = new Date();
+    var d2 = null;
+    do { d2 = new Date(); }
+    while (d2 - d < ms);
+}
+
 /* gibt ein elementby id zurück bezogen auf dieses Object
 Object.prototype.g = function(id)
 {
