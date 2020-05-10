@@ -43,8 +43,9 @@ function feld(_id, _figur)
 	this.img=img;
 	//this.figur=figur;
     this.empty = empty;
+    //gibt ein Array zurück, da mehrere Figuren auf einem Feld stehen können
     this.getFigur = function () {
-        return this.figur;
+        return figur;
     }
 	
 	// functions
@@ -96,16 +97,16 @@ function figur(_name)
     this.cards = cards;
 
     // setters
-    this.setFeldId = function (feldId) {
-        this.feldId = feldId;
+    this.setFeldId = function (_feldId) {
+        this.feldId = _feldId;
     }
-    this.setName = function (name) {
-        this.name = name;
-        this.type = name.substring(0, 1);
-        this.color = name.substring(1, 2);
+    this.setName = function (nam) {
+        this.name = nam;
+        this.type = nam.substring(0, 1);
+        this.color = nam.substring(1, 2);
         var prefix = "img/svg/";
         var suffix = ".svg";
-        this.img = prefix + name + suffix;
+        this.img = prefix + nam + suffix;
         // figuren id nötig weil 2 figuren auf einem feld stehen können?!
         this.id = Math.random().toString(36).substr(2, 9);
     }
@@ -132,19 +133,62 @@ function figur(_name)
 
 //leere funktion für züge damit keine fehler kommen
 function someMoveFunction(figur) {
-    console.log(figur.name + " steht auf " + figur.feldId);
+    //console.log(figur.name + " steht auf " + figur.feldId);
 
     return ["e2-e3", "e2-e4"];
 }
 
-// tests
+/*tests
 var fig = new figur("Rw");
-//fig.setFeldId("a1");
+fig.setName("Kw");
+var fig2 = new figur("Qb");
 
-var fel = new feld("a1", fig);
-//fel.setFigur(fig);
+
+var fel = new feld("a1");
+fel.setFigur(fig);
+fel.setFigur(fig2);
+//fel.removeFigur(fig);
+var figuren = fel.getFigur();
 fig.setMoves();
 var m = fig.moves;
-console.log(m);
-var m2 = fel.getFigur();
-console.log(m2);
+//console.log(m);
+var m2 = fig;
+console.log(figuren[0].color);
+console.log("neuer test; " + m2.name + " steht auf " + m2.feldId);
+
+allgemeine tests
+function a(name) {
+    var name = "";
+    var b = "placeholder";
+
+    this.setName = function (na) {
+        this.name = na;
+    }
+    this.getName = function () {
+        return this.name;
+    }
+
+    this.setB = function (bl) {
+        this.b = bl;
+    }
+    this.getB = function () {
+        return this.b;
+    }
+}
+
+function b(nam) {
+    var name = "";
+    var c = 42;
+
+    this.setName = function (na) {
+        this.name = na;
+    }
+
+    this.c = c;
+    this.name = nam;
+}
+var t1 = new b("child");
+var t2 = new a("parent");
+t2.setName("Toni");
+t2.setB(t1);
+console.log(t2.getB().name);*/
