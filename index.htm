@@ -7,6 +7,7 @@
     <script type="text/javascript" src="js/cards.js"></script>
     <script type="text/javascript" src="js/feld.js"></script>
     <script type="text/javascript" src="js/boardLogic.js"></script>
+    <script type="text/javascript" src="js/zuggenerator.js"></script>
     <script type="text/javascript">
 <!--
 
@@ -16,7 +17,8 @@
             var cb = g("chessboard");
             cb.appendChild(board);
 
-            var dasBrett=setBoard(board);
+            // baut das Brett auf und weist b alle Felder mit den Startpositionen zu
+            b = setBoard(board);
         }
 
         //--></script>

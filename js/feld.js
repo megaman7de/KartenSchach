@@ -83,7 +83,9 @@ function figur(_name)
     var type = "";
 	var color = "";
 	var moves = [];
-	var cards = [];
+    var cards = [];
+    // nötig für Rochade und 50-Züge Regel; 0=nicht bewegt, 5=im 5. Halbzug bewegt
+    var hasMoved = 0;
 
     // getters
     this.id = id;
@@ -94,6 +96,7 @@ function figur(_name)
     this.feldId = feldId;
     this.moves = moves;
     this.cards = cards;
+    this.hasMoved = hasMoved;
 
     // setters
     this.setFeldId = function (_feldId) {
@@ -122,6 +125,10 @@ function figur(_name)
     // functions
     this.removeCard = function (cardId) {
         removeE(cards, cardId);
+    }
+    // in welchem Halbzug wurde die Figur bewegt?
+    this.raiseMove = function (moveNumber) {
+        hasMoved = moveNumber;
     }
 
     // falls mit parameter aufgerufen wird
