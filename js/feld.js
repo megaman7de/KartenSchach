@@ -20,9 +20,9 @@ function feld(_id, _figur)
 		this.x=idToK(id)[0];
 		this.y=idToK(id)[1];
 	}
-	this.setCards=function(cardId)
+	this.setCards=function(card)
 	{
-		cards.push(cardId);
+		cards.push(card);
 		// toDo: bild dem feld hinzufügen (eigentlich view aufgabe)
 		// welches bild wenn 2 Karten auf ein feld gespielt wurden?
 	}
@@ -49,10 +49,9 @@ function feld(_id, _figur)
     }
 	
 	// functions
-	// evtl enthält cards nicht nur die ids sondern die Karten als Objekte
-	this.removeCard=function(cardId)
+	this.removeCard=function(card)
 	{
-		removeE(cards, cardId);
+		removeE(cards, card);
 	}
 	this.removeFigur=function(figurId)
 	{
@@ -116,8 +115,8 @@ function figur(_name)
         this.moves = someMoveFunction(this);
     }
 
-    this.setCards = function (cardId) {
-        cards.push(cardId);
+    this.setCards = function (card) {
+        cards.push(card);
     }
 
     // functions
@@ -148,9 +147,15 @@ cardRequest.onload = function () {
 var fig = new figur("Rw");
 fig.setName("Kw");
 var fig2 = new figur("Qb");
+var c = new card(11);
+var c2 = new card(22);
+fig.setCards(c);
+fig.setCards(c2);
+//fig.removeCard(c);
 
 
 var fel = new feld("a1");
+fel.setCards(new card(5));
 fel.setFigur(fig);
 fel.setFigur(fig2);
 //fel.removeFigur(fig);
@@ -159,7 +164,7 @@ fig.setMoves();
 var m = fig.moves;
 //console.log(m);
 var m2 = fig;
-console.log(figuren[0].color);
+console.log(fel.getFigur()[0].cards[0].title_de);
 console.log("neuer test; " + m2.name + " steht auf " + m2.feldId);
 
 allgemeine tests
