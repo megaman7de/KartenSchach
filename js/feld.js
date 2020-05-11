@@ -6,10 +6,10 @@ function feld(_id, _figur)
 	var x=-100;
 	var y=-100;
 	var empty=true;
-	// ids oder Objekte?
+	// Objekte!
 	var cards=[];
 	var img="";
-	// ids oder Objekte?
+	// Objekte!
 	var figur=[];
 	
 	// setters:
