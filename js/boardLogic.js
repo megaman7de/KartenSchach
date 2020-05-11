@@ -13,7 +13,30 @@ function drawField(field)
         feld_.style.backgroundImage = "";
     }
     if (s > 1) {
-        // toDO
+        // toDO: was wenn 2 oder mehr Karten auf ein Feld gespielt worden sind?
+    }
+}
+
+// sortiert das Brett in ein lineares Array
+// bei 8x8: 0=a1, 7=h1, 63=h8
+// bei 10x10: 0=`0, 9=i0, 10=`1, 99=i9
+function sortBoard(board) {
+    var size = board.length;
+    var l = Math.pow(size, 0.5);
+    var d2 = ((l - 8) / 2)-1;
+    var b2 = new Array(size);
+    for (var i = 0; i < size; i++) {
+        /*  kleiner hack für irgendwann a<-->b:
+            a = b + (b=a, 0) oder
+            [a, b] = [b, a]; */
+        // formel für direktes richtiges platzieren:
+        // (x+d2)+(y+d2)*l
+        var x = board[i].x;
+        var y = board[i].y;
+        b2[(x + d2) + ((y + d2) * l)] = board[i];
+    }
+    for (var i = 0; i < size; i++) {
+        board[i] = b2[i];
     }
 }
 
@@ -53,5 +76,8 @@ function setBoard(board) {
             res.push(f);
         }
     }
+
+    //Feld sortieren um Zugriff und Berechnungen zu erleichtern
+    sortBoard(res);
     return res;
 }

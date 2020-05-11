@@ -5,8 +5,12 @@
 // Liste der gespielten Züge
 var playedMoves = [];
 // das Spielbrett mit allen Figuren
-var b = ["test","bla"];
+var b = [];
 
 
 // spielrelevante Funktionen
-//function 
+// liefert 0 zurück wenn das feld mit keiner Figur besetzt ist
+// 1 falls eine weiße Figur drauf ist und 2 für eine schwarze figur
+function isFree(feld) {
+
+}
