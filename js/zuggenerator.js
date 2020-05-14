@@ -69,6 +69,14 @@ function delegate(feldId) {
                 var m = movesRook(feld);
                 console.log(m);
             } break;
+            case "B": {
+                var m = movesBishop(feld);
+                console.log(m);
+            } break;
+            case "Q": {
+                var m = movesQueen(feld);
+                console.log(m);
+            } break;
             default: {
                 console.log("Error: Type not found");
             }
@@ -77,6 +85,41 @@ function delegate(feldId) {
     else {
         //toDo: 2 Figuren
     }
+}
+
+// Turm/Läufer/Dame vereinheitlichen
+// erwartet das Feld und die Zugmöglichkeiten (p)
+function movesBRQ(feld, p) {
+    var res = [];
+    var figur = feld.getFigur()[0];
+    var x = feld.x;
+    var y = feld.y;
+    for (var i = 0; i < p.length; i++) {
+        // durch gehen bis man auf rand oder figur stößt
+        var newX = x + p[i][0];
+        var newY = y + p[i][1];
+        do {
+            var id = kToId(newX, newY);
+            var newFeld = getFeldById(id);
+            var pattern = isFree(newFeld);
+            var isInF = isInField(newFeld);
+            // frei, andere figur und im feld
+            if ((pattern === 0 || pattern === figur.color * -1) && isInF) {
+                if (pattern == 0) {
+                    res.push(figur.type + feld.id + "-" + newFeld.id);
+                    newX += p[i][0];
+                    newY += p[i][1];
+                }
+                else {
+                    res.push(figur.type + feld.id + "x" + newFeld.id);
+                    break;
+                }
+            }
+            if (!isInF || pattern === figur.color) break;
+        }
+        while (isInF && pattern !== NaN)
+    }
+    return res;
 }
 
 // gibt die Zugmöglichkeit eines Pferdes wieder
@@ -118,43 +161,36 @@ function movesKnight(feld) {
 
 // gibt die Zugmöglichkeit eines Turms wieder
 function movesRook(feld) {
-    var res = [];
-    var figur = feld.getFigur()[0];
-    // possibility
     var p = [
         [1, 0],
         [-1, 0],
         [0, 1],
         [0, -1]
     ];
-    var x = feld.x;
-    var y = feld.y;
-    for (var i = 0; i < p.length; i++) {
-        // durch gehen bis man auf rand oder figur stößt
-        var newX = x + p[i][0];
-        var newY = y + p[i][1];
-        do
-        {
-            var id = kToId(newX, newY);
-            var newFeld = getFeldById(id);
-            var pattern = isFree(newFeld);
-            var isInF = isInField(newFeld);
-            // frei, andere figur und im feld
-            if ((pattern === 0 || pattern === figur.color * -1) && isInF) {
-                if (pattern == 0) {
-                    res.push(figur.type + feld.id + "-" + newFeld.id);
-                    newX += p[i][0];
-                    newY += p[i][1];
-                }
-                else {
-                    res.push(figur.type + feld.id + "x" + newFeld.id);
-                    break;
-                }
-            }
-            if (!isInF || pattern === figur.color) break;
-        }
-        while(isInF && pattern !== NaN)
-    }
+    return movesBRQ(feld, p);
+}
 
-    return res;
+// gibt die Zugmöglichkeit eines Läufers wieder
+function movesBishop(feld) {
+    var p = [
+        [1, 1],
+        [1, -1],
+        [-1, 1],
+        [-1, -1]
+    ];
+    return movesBRQ(feld, p);
+}
+// gibt die Zugmöglichkeit einer Dame wieder
+function movesQueen(feld) {
+    var p = [
+        [1, 1],
+        [1, -1],
+        [-1, 1],
+        [-1, -1],
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1]
+    ];
+    return movesBRQ(feld, p);
 }
