@@ -68,7 +68,7 @@ function setBoard(board) {
             if ((f.y == 1 || f.y == 8) && f.x > 0 && f.x < 9) {
                 fi = f.y == 1 ? new figur(aufstellung[f.x - 1] + "w") : new figur(aufstellung[f.x - 1] + "b");
             }
-
+            //toDo Bug in 12x12 finden
             if (fi !== undefined) {
                 f.setFigur(fi);
                 fi = undefined;
