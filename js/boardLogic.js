@@ -16,6 +16,15 @@ function drawField(field)
         // toDO: was wenn 2 oder mehr Karten auf ein Feld gespielt worden sind?
     }
 }
+// ersetzt ein feld auf dem Brett durch ein anderes
+function replaceField(old, _new) {
+    for (var i = 0; i < b.length; i++) {
+        if (b[i] === old) {
+            b[i] = _new;
+            break;
+        }
+    }
+}
 
 // sortiert das Brett in ein lineares Array
 // bei 8x8: 0=a1, 7=h1, 63=h8
