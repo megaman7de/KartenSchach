@@ -10,9 +10,17 @@ function feld(_id, _figur)
 	var cards=[];
 	var img="";
 	// Objekte!
-	var figur=[];
+    var figur = [];
+
+    // für springerwelt
+    // toDo: vielleicht gibt ein abstrakteres Modell für alle karten
+    var visibility = true;
 	
 	// setters:
+    this.setVisibility = function (visible) {
+        this.visibility = visibility;
+    }
+
 	this.setId=function(id)
 	{
 		this.id=id;
@@ -39,6 +47,10 @@ function feld(_id, _figur)
 	}
 	
 	// getters
+    this.id = id;
+    this.x = x;
+    this.y = y;
+    this.visibility = visibility;
 	this.cards=cards;
 	this.img=img;
 	//this.figur=figur;
@@ -81,7 +93,8 @@ function figur(_name)
 	var img = "";
     var name = "";
     var type = "";
-	var color = "";
+    // 1=weiß. -1=schwarz (nützlich auch für die zugrichtung)
+	var color = 0;
 	var moves = [];
     var cards = [];
     // nötig für Rochade und 50-Züge Regel; 0=nicht bewegt, 5=im 5. Halbzug bewegt
@@ -105,7 +118,7 @@ function figur(_name)
     this.setName = function (nam) {
         this.name = nam;
         this.type = nam.substring(0, 1);
-        this.color = nam.substring(1, 2);
+        this.color = nam.substring(1, 2)==="w" ? 1 : -1;
         var prefix = "img/svg/";
         var suffix = ".svg";
         this.img = prefix + nam + suffix;
@@ -138,9 +151,9 @@ function figur(_name)
 }
 
 //leere funktion für züge damit keine fehler kommen
-function someMoveFunction(figur) {
-    //console.log(figur.name + " steht auf " + figur.feldId);
-
+// für setMoves gedacht
+function someMoveFunction(feld) {
+    console.log(figur.name + " steht auf " + figur.feldId);
     return ["e2-e3", "e2-e4"];
 }
 

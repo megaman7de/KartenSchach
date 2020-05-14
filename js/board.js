@@ -89,4 +89,5 @@ function createTable(n)
 function someFunction(sender)
 {
 	console.log(sender);
+    delegate(sender);
 }

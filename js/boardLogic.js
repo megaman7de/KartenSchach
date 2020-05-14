@@ -55,6 +55,8 @@ function setBoard(board) {
             var id = td.getAttribute("id");
             // feld erzeugen
             var f = new feld(id);
+            //ist das feld sichtbar?
+            if (td.style.visibility === "hidden") f.visibility = false;
             var fi;
 
             // figuren erzeugen und setzen
