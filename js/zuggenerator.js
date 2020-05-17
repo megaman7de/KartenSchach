@@ -72,7 +72,9 @@ function delegate(feldId) {
             } break;
             case "Q": {
                 m = movesQueen(feld);
-                figur[0].setMoves(m);
+            } break;
+            case "K": {
+                m = movesKing(feld);
             } break;
             default: {
                 console.log("Error: Type not found");
@@ -153,7 +155,69 @@ function movesKnight(feld) {
             }
         }
     }
+    return res;
+}
 
+// gibt die Zugmöglichkeit des Königs wieder
+// Im Kartenschach darf der König im Schach stehen
+function movesKing(feld) {
+    var res = [];
+    var figur = feld.getFigur()[0];
+    // possibility
+    var p = [
+        [0, 1],
+        [0, -1],
+        [1, 1],
+        [1, 0],
+        [1, -1],
+        [-1, 1],
+        [-1, 0],
+        [-1, -1]
+    ];
+
+    var x = feld.x;
+    var y = feld.y;
+    for (var i = 0; i < p.length; i++) {
+        var newX = x + p[i][0];
+        var newY = y + p[i][1];
+        var id = kToId(newX, newY);
+        var newFeld = getFeldById(id);
+        var pattern = isFree(newFeld);
+        // frei oder andere farbe und sichtbar
+        if ((pattern === 0 || pattern === figur.color * -1) && newFeld.visibility) {
+            if (pattern === 0) {
+                res.push(figur.type + feld.id + "-" + id);
+            }
+            else {
+                res.push(figur.type + feld.id + "x" + id);
+            }
+        }
+    }
+    // Rochade prüfen
+    // toDo: Darf im Kartenschach der König im Schach/durch Schach rochieren?
+    // König nicht bewegt
+    if (figur.hasMoved == 0) {
+        console.log("t1");
+        // kleine Rochade o-o
+        // felder frei
+        if (isFree(getFeldById(kToId(x + 1, y))) === 0 && isFree(getFeldById(kToId(x + 2, y))) === 0) {
+            // Turm nicht bewegt
+            if (getFeldById(kToId(x + 3, y)).getFigur()[0].hasMoved == 0) {
+                // übergibt auch den y wert
+                console.log("t3");
+                res.push("o-o"+y);
+            }
+
+        }
+        // große Rochade o-o-o
+        // felder frei
+        if (isFree(getFeldById(kToId(x - 1, y))) === 0 && isFree(getFeldById(kToId(x - 2, y))) === 0 && isFree(getFeldById(kToId(x - -3, y)))) {
+            // Turm nicht bewegt
+            if (getFeldById(kToId(x - 4, y)).getFigur()[0].hasMoved == 0) {
+                res.push("o-o-o"+y);
+            }
+        }
+    }
     return res;
 }
 

@@ -101,7 +101,14 @@ function getDestination(move) {
 		return move.substring(move.length - 2);
 	}
 	else {
-		// toDo: Rochade
+		var y = move.substring(move.length - 1, move.length);
+		if (move.indexOf("o-o-o")==0) {
+			return "c" + y;
+
+		}
+		else {
+			return "g" + y;
+        }
     }
 }
 console.log("dest: "+ getDestination("Bb1-d3"));

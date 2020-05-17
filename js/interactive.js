@@ -29,10 +29,10 @@ function toggleColor(id) {
             var x = b[i].x;
             var y = b[i].y;
             if ((x + y) % 2 == 0) {
-                g(b[i].id).style.backgroundColor = "rgb(" + 255 + ", " + 206 + ", " + 158 + ")";
+                g(b[i].id).style.backgroundColor = "rgb(" + 203 + ", " + 139 + ", " + 71 + ")";
             }
             else {
-                g(b[i].id).style.backgroundColor = "rgb(" + 203 + ", " + 139 + ", " + 71 + ")";
+                g(b[i].id).style.backgroundColor = "rgb(" + 255 + ", " + 206 + ", " + 158 + ")";
             }
         }
     }
