@@ -16,10 +16,8 @@ function isFree(feld) {
     var f;
     try {
         f = feld.getFigur();
-        console.log("isfree: " + f);
     }
     catch (e) {
-        console.log(e);
         return NaN;
     }
     if (f.length === 0) return 0;
@@ -34,6 +32,7 @@ function getFeldById(id) {
     // falls nicht gefunden worden ist wird -1 zurück gegeben
     return -1;
 }
+
 // gibt true zurück wenn wenn das Feld im spielbaren Bereich liegt
 function isInField(feld) {
     try {
@@ -60,27 +59,26 @@ function delegate(feldId) {
     if (figur.length == 1) {
         
         var type = figur[0].type;
+        var m = [];
         switch (type) {
             case "N": {
-                var m=movesKnight(feld);
-                console.log(m);
+                m=movesKnight(feld);
             } break;
             case "R": {
-                var m = movesRook(feld);
-                console.log(m);
+                m = movesRook(feld);
             } break;
             case "B": {
-                var m = movesBishop(feld);
-                console.log(m);
+                m = movesBishop(feld);
             } break;
             case "Q": {
-                var m = movesQueen(feld);
-                console.log(m);
+                m = movesQueen(feld);
+                figur[0].setMoves(m);
             } break;
             default: {
                 console.log("Error: Type not found");
             }
         }
+        figur[0].setMoves(m);
     }
     else {
         //toDo: 2 Figuren

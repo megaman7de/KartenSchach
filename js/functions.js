@@ -82,6 +82,30 @@ function wait(ms) {
     while (d2 - d < ms);
 }
 
+// konvertiert rgb(255,127,0) zu [255,127,0]
+function getRGB(c) {
+	var res = [];
+	var co = c.substring(4, c.length-1);
+	var co = co.split(","); 
+	for (var i = 0; i < co.length; i++) {
+		res.push(parseFloat(co[i]));
+	}
+	return res;
+}
+
+// liefert das zielfeld
+// macht aus Bb1-d3 --> d3
+function getDestination(move) {
+	var rochade = move.indexOf("o");
+	if (rochade == -1) {
+		return move.substring(move.length - 2);
+	}
+	else {
+		// toDo: Rochade
+    }
+}
+console.log("dest: "+ getDestination("Bb1-d3"));
+
 /* gibt ein elementby id zurück bezogen auf dieses Object
 Object.prototype.g = function(id)
 {

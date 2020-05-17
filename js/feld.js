@@ -125,10 +125,9 @@ function figur(_name)
         // figuren id nötig weil 2 figuren auf einem feld stehen können?!
         this.id = Math.random().toString(36).substr(2, 9);
     }
-    // toDo zuggenerator/zuglogic fehlt
-    this.setMoves = function () {
-        // ganze figur wird übergeben
-        this.moves = someMoveFunction(this);
+    this.setMoves = function (mov) {
+        // Array an Zügen wird übergeben ["e2-e3","e2-e4"]
+        this.moves = mov;
     }
 
     this.setCards = function (card) {

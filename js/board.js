@@ -88,6 +88,7 @@ function createTable(n)
 // leere Funktion für später damit es jetzt keine fehler gibt
 function someFunction(sender)
 {
-	console.log(sender);
+    console.log("sf: " + sender);
     delegate(sender);
+    toggleColor(sender);
 }
