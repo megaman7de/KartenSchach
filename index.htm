@@ -22,13 +22,13 @@
             // baut das Brett auf und weist b alle Felder mit den Startpositionen zu
             b = setBoard(board);
             //testing
-            var nf = new feld("e7");
+            var nf = new feld("e6");
             var nf2 = new feld("f8");
             var nf3 = new feld("g8");
-            nf.setFigur(new figur("Kw"));
+            nf.setFigur(new figur("Qw"));
             replaceField(getFeldById(nf.id), nf);
-            replaceField(getFeldById(nf2.id), nf2);
-            replaceField(getFeldById(nf3.id), nf3);
+            //replaceField(getFeldById(nf2.id), nf2);
+            //replaceField(getFeldById(nf3.id), nf3);
             drawField(nf);
         }
 

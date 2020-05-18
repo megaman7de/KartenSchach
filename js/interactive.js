@@ -16,10 +16,10 @@ function toggleColor(id) {
             var dest = getDestination(moves[i]);
             var feld_dest = getFeldById(dest);
             if ((feld_dest.x + feld_dest.y) % 2 == 0) {
-                g(dest).style.backgroundColor = "rgb(" + 173 + "," + 204 + "," + 134 + ")";
+                g(dest).style.backgroundColor = "rgb(" + 158 + "," + 180 + "," + 98 + ")";
             }
             else {
-                g(dest).style.backgroundColor = "rgb(" + 158 + "," + 180 + "," + 98 + ")";
+                g(dest).style.backgroundColor = "rgb(" + 173 + "," + 204 + "," + 134 + ")";
             }
         }
         td.style.backgroundColor = "rgb(" + 255 + "," + 255 + "," + 85 + ")";

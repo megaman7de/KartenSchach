@@ -3,7 +3,7 @@
 
 // globale variablen
 // Liste der gespielten Züge
-var playedMoves = [];
+var playedMoves = ["Pd7-d5"];
 // das Spielbrett mit allen Figuren
 var b = [];
 
@@ -75,6 +75,9 @@ function delegate(feldId) {
             } break;
             case "K": {
                 m = movesKing(feld);
+            } break;
+            case "P": {
+                m = movesPawn(feld);
             } break;
             default: {
                 console.log("Error: Type not found");
@@ -211,13 +214,61 @@ function movesKing(feld) {
         }
         // große Rochade o-o-o
         // felder frei
-        if (isFree(getFeldById(kToId(x - 1, y))) === 0 && isFree(getFeldById(kToId(x - 2, y))) === 0 && isFree(getFeldById(kToId(x - -3, y)))) {
+        if (isFree(getFeldById(kToId(x - 1, y))) === 0 && isFree(getFeldById(kToId(x - 2, y))) === 0 && isFree(getFeldById(kToId(x - -3, y))) === 0) {
             // Turm nicht bewegt
             if (getFeldById(kToId(x - 4, y)).getFigur()[0].hasMoved == 0) {
                 res.push("o-o-o"+y);
             }
         }
     }
+    return res;
+}
+
+// gibt die Zugmöglichkeit eines Pferdes wieder
+function movesPawn(feld) {
+    var res = [];
+    var figur = feld.getFigur()[0];
+
+    var x = feld.x;
+    var y = feld.y;
+    var z = figur.color;
+
+    // eins gerade aus laufen
+    if (isFree(getFeldById(kToId(x, y + z))) === 0)
+    {
+        res.push(figur.type + feld.id + "-" + kToId(x, y + z));
+    }
+    // 2 felder am anfang laufen
+    if ((y == 2 && z == 1) || (y == 7 && z == -1)) {
+        if (isFree(getFeldById(kToId(x, y + z))) === 0 && isFree(getFeldById(kToId(x, y + 2 * z))) === 0) {
+            res.push(figur.type + feld.id + "-" + kToId(x, y + 2*z));
+        }
+    }
+    // schräg schlagen links
+    if (isFree(getFeldById(kToId(x-1, y + z))) === z*-1) {
+        res.push(figur.type + feld.id + "x" + kToId(x - 1, y + z));
+    }
+    // schräg schlagen rechts
+    if (isFree(getFeldById(kToId(x + 1, y + z))) === z * -1) {
+        res.push(figur.type + feld.id + "x" + kToId(x + 1, y + z));
+    }
+    // en-passent
+    // letzter Zug war Bauernzug
+    var l = playedMoves[playedMoves.length - 1];
+    if (l.substring(0, 1) == "P") {
+        console.log("t1");
+        // Bauer wurde 2 felder bewegt
+        var von = idToK(l.substring(1, 3));
+        var nach = idToK(l.substring(4, 6));
+        if (Math.abs(von[1] - nach[1]) == 2) {
+            console.log("t2");
+            // dieser Bauer ist neben dem Bauer
+            if (Math.abs(x - nach[0]) == 1 && y==nach[1]) {
+                res.push(figur.type + feld.id + "x" + kToId(nach[0], y+z));
+            }
+        }
+    }
+
     return res;
 }
 
