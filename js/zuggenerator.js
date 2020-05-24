@@ -224,7 +224,7 @@ function movesKing(feld) {
     return res;
 }
 
-// gibt die Zugmöglichkeit eines Pferdes wieder
+// gibt die Zugmöglichkeit eines Bauerns wieder
 function movesPawn(feld) {
     var res = [];
     var figur = feld.getFigur()[0];
@@ -256,12 +256,10 @@ function movesPawn(feld) {
     // letzter Zug war Bauernzug
     var l = playedMoves[playedMoves.length - 1];
     if (l.substring(0, 1) == "P") {
-        console.log("t1");
         // Bauer wurde 2 felder bewegt
         var von = idToK(l.substring(1, 3));
         var nach = idToK(l.substring(4, 6));
         if (Math.abs(von[1] - nach[1]) == 2) {
-            console.log("t2");
             // dieser Bauer ist neben dem Bauer
             if (Math.abs(x - nach[0]) == 1 && y==nach[1]) {
                 res.push(figur.type + feld.id + "x" + kToId(nach[0], y+z));
