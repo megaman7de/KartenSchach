@@ -1,13 +1,6 @@
 // diese Datei soll Standardschach bereit stellen und
 // die spätere Integration für ausgespielte Karten sicher stellen
 
-// globale variablen
-// Liste der gespielten Züge
-var playedMoves = ["Pd7-d5"];
-// das Spielbrett mit allen Figuren
-var b = [];
-
-
 // spielrelevante Funktionen
 // liefert 0 zurück wenn das feld mit keiner Figur besetzt ist
 // 1 falls eine weiße Figur drauf ist und -1 für eine schwarze figur
@@ -55,10 +48,22 @@ function isInField(feld) {
 function delegate(feldId) {
     var feld = getFeldById(feldId);
     var figur = feld.getFigur();
+    var fieldColor = g(feldId).style.backgroundColor;
 
-    if (figur.length == 1) {
-        
+    if (figur.length == 0) {
+        if (fieldColor == whiteFieldColor || fieldColor == blackFieldColor) {
+            toggleColor(feldId);
+        }
+    }
+
+    if (figur.length == 1) {        
         var type = figur[0].type;
+        if (fieldColor == whiteFieldColorMarked || fieldColor == blackFieldColorMarked) {
+            __selectedFigure += "-" +  feldId;
+        }
+        else {
+            __selectedFigure = type + feldId;
+        }
         var m = [];
         switch (type) {
             case "N": {
@@ -88,6 +93,16 @@ function delegate(feldId) {
     else {
         //toDo: 2 Figuren
     }
+    
+    // wenn es sich um ein Zielfeld handelt
+    if (fieldColor == whiteFieldColorMarked || fieldColor == blackFieldColorMarked) {
+        __selectedFigure += "-" + feldId;
+    }
+    toggleColor(feldId);
+    /* wenn eine leeres feld oder die eigene figur markiert worden ist
+    if ((fieldColor == whiteFieldColor || fieldColor == blackFieldColor) && ) {
+        __selectedFigure = "";
+    }*/
 }
 
 // Turm/Läufer/Dame vereinheitlichen
@@ -214,7 +229,7 @@ function movesKing(feld) {
         }
         // große Rochade o-o-o
         // felder frei
-        if (isFree(getFeldById(kToId(x - 1, y))) === 0 && isFree(getFeldById(kToId(x - 2, y))) === 0 && isFree(getFeldById(kToId(x - -3, y))) === 0) {
+        if (isFree(getFeldById(kToId(x - 1, y))) === 0 && isFree(getFeldById(kToId(x - 2, y))) === 0 && isFree(getFeldById(kToId(x - 3, y))) === 0) {
             // Turm nicht bewegt
             if (getFeldById(kToId(x - 4, y)).getFigur()[0].hasMoved == 0) {
                 res.push("o-o-o"+y);

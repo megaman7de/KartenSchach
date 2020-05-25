@@ -44,11 +44,11 @@ function createBoard(hidden)
             // "weiﬂ"=#ffce9e; "schwarz"=#d18b47
             if((x.charCodeAt(0)+y)%2==0)
             {
-                td.style.backgroundColor="#d18b47";
+                td.style.backgroundColor = blackFieldColor;
             }
             else
             {
-                 td.style.backgroundColor="#ffce9e";
+                td.style.backgroundColor = whiteFieldColor;
             }
             
             // unsichtbar setzen
@@ -90,5 +90,4 @@ function someFunction(sender)
 {
     console.log("sf: " + sender);
     delegate(sender);
-    toggleColor(sender);
 }

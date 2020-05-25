@@ -1,3 +1,19 @@
+// globale variablen
+// Liste der gespielten Züge
+var playedMoves = ["",""];
+// das Spielbrett mit allen Figuren
+var b = [];
+// farben
+var blackFieldColor = "rgb(209, 139, 71)";
+var whiteFieldColor = "rgb(255, 206, 158)";
+var blackFieldColorMarked = "rgb(158, 180, 98)";
+var whiteFieldColorMarked = "rgb(173, 204, 134)";
+var selectedFieldColor = "rgb(255, 255, 85)";
+// variable für klicks
+var __isEven = false;
+var __selectedFigure = "";
+
+
 // wandelt 1,2,3 zu a,b,c
 // deprecated; durch kToId ersetzt
 function xr(n)
@@ -50,6 +66,16 @@ function removeE(arr, e) {
     var index = arr.indexOf(e);
     if (index > -1) {
         arr.splice(index, 1);
+    }
+}
+
+// gibt ein Element aus einem array zurück wenn ein string darin vorkommt
+// erwatet das array a und den string s als parameter
+function getElementByString(a, s) {
+	for (var i = 0; i < a.length; i++) {
+		if (a[i].indexOf(s) != -1) {
+			return a[i];
+        }
     }
 }
 
