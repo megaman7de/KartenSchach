@@ -45,64 +45,87 @@ function isInField(feld) {
 }
 
 // verteilt den aufruf an die richtige funktion
-function delegate(feldId) {
+function delegate2(feldId) {
     var feld = getFeldById(feldId);
     var figur = feld.getFigur();
     var fieldColor = g(feldId).style.backgroundColor;
 
-    if (figur.length == 0) {
-        if (fieldColor == whiteFieldColor || fieldColor == blackFieldColor) {
-            toggleColor(feldId);
-        }
-    }
+    // is das Feld Markiert?
+    var isFieldMarked = (fieldColor == blackFieldColor || fieldColor == whiteFieldColor) ? false : true;
 
-    if (figur.length == 1) {        
-        var type = figur[0].type;
-        if (fieldColor == whiteFieldColorMarked || fieldColor == blackFieldColorMarked) {
-            __selectedFigure += "-" +  feldId;
-        }
-        else {
-            __selectedFigure = type + feldId;
-        }
-        var m = [];
-        switch (type) {
-            case "N": {
-                m=movesKnight(feld);
-            } break;
-            case "R": {
-                m = movesRook(feld);
-            } break;
-            case "B": {
-                m = movesBishop(feld);
-            } break;
-            case "Q": {
-                m = movesQueen(feld);
-            } break;
-            case "K": {
-                m = movesKing(feld);
-            } break;
-            case "P": {
-                m = movesPawn(feld);
-            } break;
-            default: {
-                console.log("Error: Type not found");
+    // ist eine Figur Selektiert?
+    var isFigureSelected = __selectedFigure === "" ? false : true;
+
+    if (isFieldMarked) {
+        if (isFigureSelected) {
+            //gleiches feld?
+            if (feldId == __selectedFigure.substring(1, 3)) {
+                resetBoardColor();
+            }
+            else {
+                //zug selectieren
+                __selectedFigure += "-" + feldId;
+                moveFigure();
+                resetBoardColor();
             }
         }
-        figur[0].setMoves(m);
+        // keine Figur ist Selektiert
+        else {
+            alert("feld markiert und keine figur selectiert !?!?");
+        }
     }
+    //feld ist unmarkiert
     else {
-        //toDo: 2 Figuren
+        if (isFigureSelected) {
+            resetBoardColor();
+        }
+        // keine Figur ist Selektiert
+        else {
+            //ist eine figur auf dem feld?
+            if (figur.length == 0) {
+                // nichts machen
+            }
+            else {
+                var type = figur[0].type;
+
+                var m = [];
+                switch (type) {
+                    case "N": {
+                        m = movesKnight(feld);
+                    } break;
+                    case "R": {
+                        m = movesRook(feld);
+                    } break;
+                    case "B": {
+                        m = movesBishop(feld);
+                    } break;
+                    case "Q": {
+                        m = movesQueen(feld);
+                    } break;
+                    case "K": {
+                        m = movesKing(feld);
+                    } break;
+                    case "P": {
+                        m = movesPawn(feld);
+                    } break;
+                    default: {
+                        console.log("Error: Type not found");
+                    }
+                }
+
+                figur[0].setMoves(m);
+
+                // Zugmöglichkeiten markieren
+                setBoardColor(figur[0].moves);
+                //feld highlighten
+                g(feldId).style.backgroundColor = selectedFieldColor;
+                // figur selectieren
+                __selectedFigure = type + feldId;
+
+                //toDO mehrere figuren
+            }
+        }
     }
-    
-    // wenn es sich um ein Zielfeld handelt
-    if (fieldColor == whiteFieldColorMarked || fieldColor == blackFieldColorMarked) {
-        __selectedFigure += "-" + feldId;
-    }
-    toggleColor(feldId);
-    /* wenn eine leeres feld oder die eigene figur markiert worden ist
-    if ((fieldColor == whiteFieldColor || fieldColor == blackFieldColor) && ) {
-        __selectedFigure = "";
-    }*/
 }
 
 // Turm/Läufer/Dame vereinheitlichen

@@ -1,26 +1,28 @@
 // dies Datei soll für User-Interaktionen zuständig sein
 
-// Ändert die Hintergrundfarbe beim ersten Klick
-// setzt sie beim zweiten Klick zurück
-function toggleColor(id) {
-    var td = g(id);
-    var feld = getFeldById(id);
-    var figur = feld.getFigur();
-    var fieldColor = td.style.backgroundColor;
-    if (figur.length == 0) {
-        // wenn ein Zielfeld ausgewählt worden ist (ein Zug gemacht wurde)
-        if (fieldColor == whiteFieldColorMarked || fieldColor == blackFieldColorMarked) {
-            moveFigure();
-            return;
+// setzt die Feldfarben auf standard zurück ( hebt markierungen auf)
+function resetBoardColor() {
+    // Feldfarben zurücksetzen
+    for (var i = 0; i < b.length; i++) {
+        var x = b[i].x;
+        var y = b[i].y;
+        if ((x + y) % 2 == 0) {
+            // "schwarzes" Feld
+            g(b[i].id).style.backgroundColor = blackFieldColor;
         }
         else {
-            // kein gültiger zug gewählt
+            // "weißes Feld"
+            g(b[i].id).style.backgroundColor = whiteFieldColor;
         }
-        
     }
-    var moves = figur.length==0 ? 0 : figur[0].moves;
 
-    if (!__isEven) {
+    // hebt auch die aktuelle selectierung auf
+    __selectedFigure = "";
+}
+
+// markiert die spielbaren Züge; erwartet die züge als Array
+function setBoardColor(moves) {
+
         for (var i = 0; i < moves.length; i++) {
             var dest = getDestination(moves[i]);
             var feld_dest = getFeldById(dest);
@@ -32,31 +34,7 @@ function toggleColor(id) {
                 // grün markiertes weißes Feld
                 g(dest).style.backgroundColor = whiteFieldColorMarked;
             }
-           
         }
-        // toDo: Felder richtig markieren
-        td.style.backgroundColor = selectedFieldColor;
-    }
-    else {
-        // wenn ein Zielfeld ausgewählt worden ist (ein Zug gemacht wurde)
-        if (fieldColor == whiteFieldColorMarked || fieldColor == blackFieldColorMarked) {
-            moveFigure();
-        }
-        // Feldfarben zurücksetzen
-        for (var i = 0; i < b.length; i++) {
-            var x = b[i].x;
-            var y = b[i].y;
-            if ((x + y) % 2 == 0) {
-                // "schwarzes" Feld
-                g(b[i].id).style.backgroundColor = blackFieldColor;
-            }
-            else {
-                // "weißes Feld"
-                g(b[i].id).style.backgroundColor = whiteFieldColor;
-            }
-        }
-    }
-    __isEven = !__isEven;
 }
 
 // bewegt eine Figur auf dem Brett
@@ -71,6 +49,7 @@ function moveFigure() {
     var sourceFigur = sourceField.getFigur();
     // playedMoves updaten
     playedMoves.push(getElementByString(sourceFigur[0].moves, dest));
+    console.log(" züge: " + sourceFigur[0].moves);
     console.log(playedMoves);
     // hasMoved updaten
     sourceFigur[0].hasMoved = playedMoves.length - 2;
@@ -86,8 +65,5 @@ function moveFigure() {
     drawField(getFeldById(source));
     drawField(getFeldById(dest));
 
-
-    // felder togglen
-    toggleColor(source);
     console.log(__selectedFigure + "  move wurde ausgelöst " + source + "--" + dest);
 }
