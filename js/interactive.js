@@ -47,8 +47,56 @@ function moveFigure() {
     var destField = getFeldById(dest);
     var destFigur = destField.getFigur();
     var sourceFigur = sourceField.getFigur();
+
+    var isRochade = false;
+    var isEnPassent = false;
+    var isPromotion = false;
+
+    // rochade feststellen
+    var diffX = idToK(source)[0] - idToK(dest)[0];
+    var wob = idToK(source)[1] == 1 ? 1 : 8;
+    if (sourceFigur[0].type == "K" && Math.abs(diffX) == 2) {
+        isRochade = !isRochade;
+        //kleineRochade
+        if (diffX == -2) {
+            var feldAlt = getFeldById("h" + wob);
+            var feldNeu = getFeldById("f" + wob);
+            var rookOld = feldAlt.getFigur()[0];
+            rookOld.hasMoved = playedMoves.length - 2;
+            //neu setzen
+            feldNeu.setFigur(rookOld);
+            //löschen
+            feldAlt.removeFigur(rookOld);
+            //neu zeichnen
+            drawField(feldNeu);
+            drawField(feldAlt);
+            //playedMoves updaten
+            playedMoves.push("o-o");
+        }
+        //große rochade
+        else {
+            var feldAlt = getFeldById("a" + wob);
+            var feldNeu = getFeldById("d" + wob);
+            var rookOld = feldAlt.getFigur()[0];
+            rookOld.hasMoved = playedMoves.length - 2;
+            //neu setzen
+            feldNeu.setFigur(rookOld);
+            //löschen
+            feldAlt.removeFigur(rookOld);
+            //neu zeichnen
+            drawField(feldNeu);
+            drawField(feldAlt);
+            //playedMoves updaten
+            playedMoves.push("o-o-o");
+        }
+
+    }
+
     // playedMoves updaten
-    playedMoves.push(getElementByString(sourceFigur[0].moves, dest));
+    if (!isEnPassent && !isPromotion && !isRochade) {
+        playedMoves.push(getElementByString(sourceFigur[0].moves, dest));
+    }
+    
     console.log(" züge: " + sourceFigur[0].moves);
     console.log(playedMoves);
     // hasMoved updaten

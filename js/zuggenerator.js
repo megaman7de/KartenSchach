@@ -114,6 +114,7 @@ function delegate2(feldId) {
                 }
 
                 figur[0].setMoves(m);
+                console.log("mögliche züge: " + figur[0].moves);
 
                 // Zugmöglichkeiten markieren
                 setBoardColor(figur[0].moves);
@@ -238,14 +239,12 @@ function movesKing(feld) {
     // toDo: Darf im Kartenschach der König im Schach/durch Schach rochieren?
     // König nicht bewegt
     if (figur.hasMoved == 0) {
-        console.log("t1");
         // kleine Rochade o-o
         // felder frei
         if (isFree(getFeldById(kToId(x + 1, y))) === 0 && isFree(getFeldById(kToId(x + 2, y))) === 0) {
             // Turm nicht bewegt
             if (getFeldById(kToId(x + 3, y)).getFigur()[0].hasMoved == 0) {
                 // übergibt auch den y wert
-                console.log("t3");
                 res.push("o-o"+y);
             }
 
